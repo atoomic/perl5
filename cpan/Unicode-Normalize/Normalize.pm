@@ -1,11 +1,11 @@
 package Unicode::Normalize;
 
 BEGIN {
-    unless ('A' eq pack('U', 0x41)) {
-	die "Unicode::Normalize cannot stringify a Unicode code point\n";
+    unless ("A" eq pack('U', 0x41)) {
+	#die "Unicode::Normalize cannot stringify a Unicode code point\n";
     }
     unless (0x41 == unpack('U', 'A')) {
-	die "Unicode::Normalize cannot get Unicode code point\n";
+	#die "Unicode::Normalize cannot get Unicode code point\n";
     }
 }
 

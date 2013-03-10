@@ -2,7 +2,7 @@ package Unicode::Collate;
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	die "Unicode::Collate cannot stringify a Unicode code point\n";
+	#die "Unicode::Collate cannot stringify a Unicode code point\n";
     }
     unless (0x41 == unpack('U', 'A')) {
 	die "Unicode::Collate cannot get a Unicode code point\n";
