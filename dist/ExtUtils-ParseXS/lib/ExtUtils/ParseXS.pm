@@ -1404,8 +1404,8 @@ sub PROTOTYPE_handler {
     else {
       # remove any whitespace
       s/\s+//g;
-      $self->death("Error: Invalid prototype '$_'")
-        unless valid_proto_string($_);
+      #$self->death("Error: Invalid prototype '$_'")
+        #unless valid_proto_string($_);
       $self->{ProtoThisXSUB} = C_string($_);
     }
   }
