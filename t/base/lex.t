@@ -253,8 +253,9 @@ print ((exists $str{xyz::bar} ? "" : "not ")."ok $test\n"); ++$test;
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
-eval "\$x =\xE2foo";
-if ($@ =~ /Unrecognized character \\xE2; marked by <-- HERE after \$x =<-- HERE near column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+# \xDF is a non-ASCII alpha on both ASCII and EBCDIC.
+eval "\$x =\xDFfoo";
+if ($@ =~ /Unrecognized character \\xDF; marked by <-- HERE after \$x =<-- HERE near column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;
 
 # Is "[~" scanned correctly?
