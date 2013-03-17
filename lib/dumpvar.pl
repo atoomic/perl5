@@ -14,6 +14,8 @@ package dumpvar;
 
 $winsize = 80 unless defined $winsize;
 
+sub ASCII { return ord('A') == 65; }
+
 
 # Defaults
 
@@ -41,7 +43,8 @@ sub unctrl {
 	local($v) ; 
 
 	return \$_ if ref \$_ eq "GLOB";
-        if (ord('A') == 193) { # EBCDIC.
+        if (! ASCII) {
+        # I think this has changed
 	    # EBCDIC has no concept of "\cA" or "A" being related
 	    # to each other by a linear/boolean mapping.
 	} else {
@@ -80,7 +83,8 @@ sub _stringify {
 	
 	if ($tick eq 'auto') {
 	    if (ord('A') == 193) {
-		if (/[\000-\011]/ or /[\013-\024\31-\037\177]/) {
+                # looks wrong here and below
+		if (/[\000-\011]/ or /[\013-\024\031-\037\177]/) {
 		    $tick = '"';
 		} else {
 		    $tick = "'";
@@ -97,21 +101,26 @@ sub _stringify {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+	  if (ASCII) {
+            s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
+          }
+          else {
+            s/([[:cntrl:]])/'\\0x'.sprintf('%2X',ord($1))/eg 
+          }
 	  # uniescape?
-	  s/([\200-\377])/'\\0x'.sprintf('%2X',ord($1))/eg 
+	  s/([[:^ascii:]])/'\\0x'.sprintf('%2X',ord($1))/eg 
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
-	  s/\033/\\e/g;
-	  if (ord('A') == 193) { # EBCDIC.
-	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # Unfinished.
+	  s/\033/\\e/g; # XXX
+	  if (! ASCII) {
+	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # XXX Unfinished.
 	  } else {
 	      s/([\000-\037\177])/'\\c'._escaped_ord($1)/eg;
 	  }
 	}
 	$_ = uniescape($_);
-	s/([\200-\377])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
+	s/([[:^ascii:]])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
 	return ($noticks || /^\d+(\.\d*)?\Z/) 
 	  ? $_ 
 	  : $tick . $_ . $tick;
@@ -119,7 +128,7 @@ sub _stringify {
 }
 
 # Ensure a resulting \ is escaped to be \\
-sub _escaped_ord {
+sub _escaped_ord {  # only ASCII
     my $chr = shift;
     $chr = chr(ord($chr)^64);
     $chr =~ s{\\}{\\\\}g;

@@ -244,8 +244,8 @@ sub backtrace {
     for (@a) {
       s/'/\\'/g;
       s/([^\0]*)/'$1'/ unless /^-?[\d.]+$/;
-      s/([\200-\377])/sprintf("M-%c",ord($1)&0177)/eg;
-      s/([\0-\37\177])/sprintf("^%c",ord($1)^64)/eg;
+      s/([[:^ascii:]])/sprintf("M-%c",utf8::unicode_to_native(utf8::native_to_unicode(ord($1))&0177))/eg;
+      s/([[:cntrl:]])/sprintf("^%c",utf8::unicode_to_native(utf8::native_to_unicode(ord($1))^64))/eg;
     }
     $w = $w ? '@ = ' : '$ = ';
     $a = $h ? '(' . join(', ', @a) . ')' : '';
