@@ -11,6 +11,8 @@ use warnings;
 use Config;
 
 BEGIN {
+    print "1..0 # Skip: for now\n";
+    exit 0;
     if (! -c "/dev/null") {
         print "1..0 # Skip: no /dev/null\n";
         exit 0;
