@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl'; require './charset_tools.pl';
 }
 
-plan tests => 143;
+plan tests => ($::IS_EBCDIC) ? 141 : 143;
 
 $_ = 'abc';
 $c = foo();
@@ -183,7 +183,10 @@ ok($@ =~ /Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x, $y) = (1, 2);';
 ok($@ =~ /Can\'t modify.*chom?p.*in.*assignment/);
 
-my @chars = ("N", latin1_to_native("\xd3"), substr ("\xd4\x{100}", 0, 1), chr 1296);
+my @chars = ("N",
+             latin1_to_native("\xd3"),
+             substr (latin1_to_native("\xd4") . "\x{100}", 0, 1),
+             chr 1296);
 foreach my $start (@chars) {
   foreach my $end (@chars) {
     local $/ = $end;
@@ -244,9 +247,11 @@ foreach my $start (@chars) {
     ok(1, "extend sp in pp_chomp");
 }
 
-{
+SKIP: {
     # [perl #73246] chop doesn't support utf8
     # the problem was UTF8_IS_START() didn't handle perl's extended UTF8
+    skip("Not representable in EBCDIC", 2) if $::IS_EBCDIC;
+
     my $utf = "\x{80000001}\x{80000000}";
     my $result = chop($utf);
     is($utf, "\x{80000001}", "chopping high 'unicode'- remnant");
