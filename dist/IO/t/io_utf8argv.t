@@ -6,6 +6,7 @@ BEGIN {
 	exit 0;
     }
     require($ENV{PERL_CORE} ? "../../t/test.pl" : "./t/test.pl");
+    skip_all("Needs EBCDIC porting fcn to convert utf8 bytes to utfebcid)") if $::IS_EBCDIC;
 }
 
 use utf8;
