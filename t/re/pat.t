@@ -17,7 +17,7 @@ BEGIN {
     chdir 't' if -d 't';
     @INC = ('../lib','.');
     require Config; import Config;
-    require './test.pl';
+    require './test.pl'; require './charset_tools.pl';
 }
 
 plan tests => 737;  # Update this when adding/deleting tests.
@@ -1097,7 +1097,7 @@ sub run_tests {
     }
     {
         # we are actually testing that we dont die when executing these patterns
-        my $e = "B\x{f6}ck";
+        my $e = "B" . latin1_to_native("\x{f6}") . "ck";
         ok(!utf8::is_utf8($e), "got a latin string - rt75680");
 
         ok($e !~ m/.*?[x]$/, "latin string against /.*?[x]\$/ - rt75680");
@@ -1124,13 +1124,10 @@ sub run_tests {
 
     }
 
-    SKIP: {   # Some constructs with Latin1 characters cause a utf8 string not
-              # to match itself in non-utf8
-        if ($::IS_EBCDIC) {
-            skip "Needs to be customized to run on EBCDIC", 6;
-        }
-        my $c = "\xc0";
-        my $pattern = my $utf8_pattern = qr/((\xc0)+,?)/;
+    {   # Some constructs with Latin1 characters cause a utf8 string not
+        # to match itself in non-utf8
+        my $c = latin1_to_native("\xc0");
+        my $pattern = my $utf8_pattern = qr/(($c)+,?)/;
         utf8::upgrade($utf8_pattern);
         ok $c =~ $pattern, "\\xc0 =~ $pattern; Neither pattern nor target utf8";
         ok $c =~ /$pattern/i, "\\xc0 =~ /$pattern/i; Neither pattern nor target utf8";
@@ -1143,13 +1140,10 @@ sub run_tests {
         ok $c =~ /$utf8_pattern/i, "\\xc0 =~ /$pattern/i; Both target and pattern utf8";
     }
 
-    SKIP: {   # Make sure can override the formatting
-        if ($::IS_EBCDIC) {
-            skip "Needs to be customized to run on EBCDIC", 2;
-        }
+    {   # Make sure can override the formatting
         use feature 'unicode_strings';
-        ok "\xc0" =~ /\w/, 'Under unicode_strings: "\xc0" =~ /\w/';
-        ok "\xc0" !~ /(?d:\w)/, 'Under unicode_strings: "\xc0" !~ /(?d:\w)/';
+        ok latin1_to_native("\xc0") =~ /\w/, 'Under unicode_strings: "\xc0" =~ /\w/';
+        ok latin1_to_native("\xc0") !~ /(?d:\w)/, 'Under unicode_strings: "\xc0" !~ /(?d:\w)/';
     }
 
     {
@@ -1292,7 +1286,8 @@ EOP
 
     { # [perl #111174]
         use re '/u';
-        like "\xe0", qr/(?i:\xc0)/, "(?i: shouldn't lose the passed in /u";
+        my $A_grave = latin1_to_native("\xc0");
+        like latin1_to_native("\xe0"), qr/(?i:$A_grave)/, "(?i: shouldn't lose the passed in /u";
         use re '/a';
         unlike "\x{100}", qr/(?i:\w)/, "(?i: shouldn't lose the passed in /a";
         use re '/aa';
@@ -1304,7 +1299,7 @@ EOP
 	# consider the UTF8ness of the previous and current pattern
 	# string, as well as the physical bytes of the pattern string
 
-	for my $s ("\xc4\x80", "\x{100}") {
+	for my $s (byte_utf8a_to_utf8n("\xc4\x80"), "\x{100}") {
 	    ok($s =~ /^$s$/, "re-compile check is UTF8-aware");
 	}
     }
@@ -1363,11 +1358,12 @@ EOP
         # EXACTish node
         ;
         ;
-        ok("\x{017F}\x{017F}" =~ qr/^[\x{00DF}]?$/i, "[] to EXACTish optimization");
+        my $sharp_s = latin1_to_native("\xdf");
+        ok("\x{017F}\x{017F}" =~ qr/^[$sharp_s]?$/i, "[] to EXACTish optimization");
     }
 
     {
-        for my $char (":", "\x{f7}", "\x{2010}") {
+        for my $char (":", latin1_to_native("\x{f7}"), "\x{2010}") {
             my $utf8_char = $char;
             utf8::upgrade($utf8_char);
             my $display = $char;
