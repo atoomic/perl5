@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
-    require './test.pl';
+    require './test.pl'; require './charset_tools.pl';
 }
 
 # This is truth in an if statement, and could be a skip message
@@ -1508,6 +1508,7 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
         $warning = $_[0];
     };
     my $out = pack("u99", "foo" x 99);
+    # XXX Unclear to me what should happen in EBCDIC
     like($warning, qr/Field too wide in 'u' format in pack at /,
          "Warn about too wide uuencode");
     is($out, ("_" . "9F]O" x 21 . "\n") x 4 . "M" . "9F]O" x 15 . "\n",
@@ -1522,34 +1523,35 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     is($x[1], $y[1], "checksum advance ok");
 
     # verify that the checksum is not overflowed with C0
-    if (ord('A') == 193) {
-	is(unpack("C0%128U", "/bcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
-    } else {
+    #if ($::IS_EBCDIC) {
+#	is(unpack("C0%128U", "/bcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
+#    } else {
 	is(unpack("C0%128U", "abcd"), unpack("U0%128U", "abcd"), "checksum not overflowed");
-    }
+#    }
 }
 
+my $U_1FFC_utf8 = byte_utf8a_to_utf8n("\341\277\274");
 {
     # U0 and C0 must be scoped
-    my (@x) = unpack("a(U0)U", "b\341\277\274");
+    my (@x) = unpack("a(U0)U", "b$U_1FFC_utf8");
     is($x[0], 'b', 'before scope');
     is($x[1], 8188, 'after scope');
 
-    is(pack("a(U0)U", "b", 8188), "b\341\277\274");
+    is(pack("a(U0)U", "b", 8188), "b$U_1FFC_utf8");
 }
 
 {
     # counted length prefixes shouldn't change C0/U0 mode
     # (note the length is actually 0 in this test)
-    if (ord('A') == 193) {
-	is(join(',', unpack("aU0C/UU", "b\0\341\277\274")), 'b,0');
-	is(join(',', unpack("aU0C/CU", "b\0\341\277\274")), 'b,0');
-    } else {
-	is(join(',', unpack("aC/UU",   "b\0\341\277\274")), 'b,8188');
-	is(join(',', unpack("aC/CU",   "b\0\341\277\274")), 'b,8188');
-	is(join(',', unpack("aU0C/UU", "b\0\341\277\274")), 'b,225');
-	is(join(',', unpack("aU0C/CU", "b\0\341\277\274")), 'b,225');
-    }
+    #if ($::IS_EBCDIC) {
+#	is(join(',', unpack("aU0C/UU", "b\0$U_1FFC_utf8")), 'b,0');
+#	is(join(',', unpack("aU0C/CU", "b\0$U_1FFC_utf8")), 'b,0');
+#    } else {
+	is(join(',', unpack("aC/UU",   "b\0$U_1FFC_utf8")), 'b,8188');
+	is(join(',', unpack("aC/CU",   "b\0$U_1FFC_utf8")), 'b,8188');
+	is(join(',', unpack("aU0C/UU", "b\0$U_1FFC_utf8")), 'b,225');
+	is(join(',', unpack("aU0C/CU", "b\0$U_1FFC_utf8")), 'b,225');
+#    }
 }
 
 {
@@ -1784,19 +1786,19 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
     is(pack("A*", $high), "\xfeb");
     is(pack("Z*", $high), "\xfeb\x00");
 
-    utf8::upgrade($high = "\xc3\xbeb");
-    is(pack("U0a2", $high), "\xfe");
-    is(pack("U0A2", $high), "\xfe");
-    is(pack("U0Z1", $high), "\x00");
-    is(pack("U0a3", $high), "\xfeb");
-    is(pack("U0A3", $high), "\xfeb");
-    is(pack("U0Z3", $high), "\xfe\x00");
-    is(pack("U0a6", $high), "\xfeb\x00\x00\x00");
-    is(pack("U0A6", $high), "\xfeb   ");
-    is(pack("U0Z6", $high), "\xfeb\x00\x00\x00");
-    is(pack("U0a*", $high), "\xfeb");
-    is(pack("U0A*", $high), "\xfeb");
-    is(pack("U0Z*", $high), "\xfeb\x00");
+    utf8::upgrade($high = byte_utf8a_to_utf8n("\xc3\xbe") . "b");
+    is(pack("U0a2", $high), latin1_to_native("\xfe"));
+    is(pack("U0A2", $high), latin1_to_native("\xfe"));
+    is(pack("U0Z1", $high), latin1_to_native("\x00"));
+    is(pack("U0a3", $high), latin1_to_native("\xfe") . "b");
+    is(pack("U0A3", $high), latin1_to_native("\xfe") . "b");
+    is(pack("U0Z3", $high), latin1_to_native("\xfe\x00"));
+    is(pack("U0a6", $high), latin1_to_native("\xfe") . "b" . latin1_to_native("\x00\x00\x00"));
+    is(pack("U0A6", $high), latin1_to_native("\xfe") . "b   ");
+    is(pack("U0Z6", $high), latin1_to_native("\xfe") . "b" . latin1_to_native("\x00\x00\x00"));
+    is(pack("U0a*", $high), latin1_to_native("\xfe") . "b");
+    is(pack("U0A*", $high), latin1_to_native("\xfe") . "b");
+    is(pack("U0Z*", $high), latin1_to_native("\xfe") . "b" . latin1_to_native("\x00"));
 }
 {
     # pack /
@@ -1825,13 +1827,13 @@ is(unpack('c'), 65, "one-arg unpack (change #18751)"); # defaulting to $_
 }
 {
     # unpack("A*", $unicode) strips general unicode spaces
-    is(unpack("A*", "ab \n\xa0 \0"), "ab \n\xa0",
+    is(unpack("A*", "ab \n" . latin1_to_native("\xa0") . " \0"), "ab \n" . latin1_to_native("\xa0"),
        'normal A* strip leaves \xa0');
-    is(unpack("U0C0A*", "ab \n\xa0 \0"), "ab \n\xa0",
+    is(unpack("U0C0A*", "ab \n" . latin1_to_native("\xa0") . " \0"), "ab \n" . latin1_to_native("\xa0"),
        'normal A* strip leaves \xa0 even if it got upgraded for technical reasons');
-    is(unpack("A*", pack("a*(U0U)a*", "ab \n", 0xa0, " \0")), "ab",
+    is(unpack("A*", pack("a*(U0U)a*", "ab \n", utf8::unicode_to_native(0xa0), " \0")), "ab",
        'upgraded strings A* removes \xa0');
-    is(unpack("A*", pack("a*(U0UU)a*", "ab \n", 0xa0, 0x1680, " \0")), "ab",
+    is(unpack("A*", pack("a*(U0UU)a*", "ab \n", utf8::unicode_to_native(0xa0), 0x1680, " \0")), "ab",
        'upgraded strings A* removes all unicode whitespace');
     is(unpack("A5", pack("a*(U0U)a*", "ab \n", 0x1680, "def", "ab")), "ab",
        'upgraded strings A5 removes all unicode whitespace');
