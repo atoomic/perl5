@@ -34,7 +34,7 @@ print "ok 3\n";
 }
 
 {
-    my $a = pack("U", 0xFF);
+    my $a = pack("U", utf8::unicode_to_native(0xFF));
 
     print "not " unless length($a) == 1;
     print "ok 6\n";
