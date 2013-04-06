@@ -178,6 +178,7 @@ foreach ("\x7f","\xff")
     local $/; # Slurp.
     my $utf8      = <DATA>;
     my $utfebcdic = <DATA>;
+    diag $utfebcdic;
     if (ord('A') == 65) {
 	eval $utf8;
     } elsif (ord('A') == 193) {
