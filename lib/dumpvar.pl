@@ -27,6 +27,9 @@ $subdump = 1;
 $dumpReused = 0 unless defined $dumpReused;
 $bareStringify = 1 unless defined $bareStringify;
 
+my $APC = chr utf8::unicode_to_native(0x9F);
+my $backslash_c_question = (ASCII) ? '\177' : $APC;
+
 sub main::dumpValue {
   local %address;
   local $^W=0;
@@ -43,13 +46,8 @@ sub unctrl {
 	local($v) ; 
 
 	return \$_ if ref \$_ eq "GLOB";
-        if (! ASCII) {
-        # I think this has changed
-	    # EBCDIC has no concept of "\cA" or "A" being related
-	    # to each other by a linear/boolean mapping.
-	} else {
-	    s/([\001-\037\177])/'^'.pack('c',ord($1)^64)/eg;
-	}
+        s/([\000-\037])/ '^' . pack('c',utf8::unicode_to_native(ord($1)^64))/eg;
+        s/ $backslash_c_question /^?/xg;
 	return $_;
     }
 }
@@ -85,12 +83,18 @@ sub _stringify {
 	    if (ord('A') == 193) {
                 # looks wrong here and below
 		if (/[\000-\011]/ or /[\013-\024\031-\037\177]/) {
+                    # Not 012 = 0xA = SS2
+                    # Not 025 = 0x15 = LF
+                    # Not 026 = 0x16 = BS
+                    # Not 027 = 0x17 = ESA
+                    # Not 030 = 0x18 = CAN
 		    $tick = '"';
 		} else {
 		    $tick = "'";
 		}
             }  else {
 		if (/[\000-\011\013-\037\177]/) {
+                # Not 012 = 0xA = LF
 		    $tick = '"';
 		} else {
 		    $tick = "'";
@@ -101,23 +105,15 @@ sub _stringify {
 	  s/([\'\\])/\\$1/g;
 	} elsif ($unctrl eq 'unctrl') {
 	  s/([\"\\])/\\$1/g ;
-	  if (ASCII) {
-            s/([\000-\037\177])/'^'.pack('c',ord($1)^64)/eg;
-          }
-          else {
-            s/([[:cntrl:]])/'\\0x'.sprintf('%2X',ord($1))/eg 
-          }
+          $_ = &unctrl($_);
 	  # uniescape?
 	  s/([[:^ascii:]])/'\\0x'.sprintf('%2X',ord($1))/eg 
 	    if $quoteHighBit;
 	} elsif ($unctrl eq 'quote') {
 	  s/([\"\\\$\@])/\\$1/g if $tick eq '"';
-	  s/\033/\\e/g; # XXX
-	  if (! ASCII) {
-	      s/([\000-\037\177])/'\\c'.chr(193)/eg; # XXX Unfinished.
-	  } else {
-	      s/([\000-\037\177])/'\\c'._escaped_ord($1)/eg;
-	  }
+          my $escape = utf8::unicode_to_native(\033);
+	  s/$escape/\\e/g;
+          s/([\000-\037$backslash_c_question])/'\\c'._escaped_ord($1)/eg;
 	}
 	$_ = uniescape($_);
 	s/([[:^ascii:]])/'\\'.sprintf('%3o',ord($1))/eg if $quoteHighBit;
@@ -128,10 +124,15 @@ sub _stringify {
 }
 
 # Ensure a resulting \ is escaped to be \\
-sub _escaped_ord {  # only ASCII
+sub _escaped_ord {
     my $chr = shift;
-    $chr = chr(ord($chr)^64);
-    $chr =~ s{\\}{\\\\}g;
+    if ($chr eq $backslash_c_question) {
+        $chr = '?';
+    }
+    else {
+        $chr = chr(ord($chr)^64);
+        $chr =~ s{\\}{\\\\}g;
+    }
     return $chr;
 }
 
