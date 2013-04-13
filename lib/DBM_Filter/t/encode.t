@@ -103,7 +103,7 @@ if (ord('A') == 193) { # EBCDIC.
 	    'alpha'	=> "\xB4\x58",
 	    'beta'	=> "\xB4\x59",
 	    "\xB4\x62"=> "gamma",		
-	    "\x65\x75\x72\x6F" => "\xA4",                           
+	    "\x65\x75\x72\x6F" => chr utf8::unicode_to_native(0xA4),
 	    ""		=> "",
 	   });
 } else {
