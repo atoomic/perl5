@@ -628,7 +628,7 @@ $(?<=^(a))	a	y	$1	a
 ([[:alpha:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	ABcd
 ([[:alnum:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	ABcd01Xy
 ([[:ascii:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	ABcd01Xy__--  ${nulnul}
-([[:cntrl:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	${nulnul}
+([[:cntrl:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	ya	$1	${nulnul}	ff is a control on EBCDIC (non-POSIX-BC), so this fails under /u rules
 ([[:digit:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	01
 ([[:graph:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	ABcd01Xy__--
 ([[:lower:]]+)	ABcd01Xy__--  ${nulnul}${ffff}	y	$1	cd
