@@ -338,9 +338,10 @@ STATIC bool
 next_uni_uu(pTHX_ const char **s, const char *end, I32 *out)
 {
     STRLEN retlen;
-    const UV val = utf8n_to_uvchr((U8 *) *s, end-*s, &retlen, UTF8_CHECK_ONLY);
-    if (val >= 0x100 || !ISUUCHAR(val) ||
-	retlen == (STRLEN) -1 || retlen == 0) {
+    const UV val = NATIVE_TO_UNI(utf8n_to_uvchr((U8 *) *s, end-*s, &retlen, UTF8_CHECK_ONLY));
+    if (val >= 0x100 || !ISUUCHAR(val)
+        || retlen == (STRLEN) -1 || retlen == 0)
+    {
 	*out = 0;
 	return FALSE;
     }
@@ -1868,17 +1869,17 @@ doencodes(U8 *h, const char *s, I32 len)
 {
     *h++ = PL_uuemap[len];
     while (len > 2) {
-	*h++ = PL_uuemap[(077 & (s[0] >> 2))];
-	*h++ = PL_uuemap[(077 & (((s[0] << 4) & 060) | ((s[1] >> 4) & 017)))];
-	*h++ = PL_uuemap[(077 & (((s[1] << 2) & 074) | ((s[2] >> 6) & 03)))];
-	*h++ = PL_uuemap[(077 & (s[2] & 077))];
+	*h++ = PL_uuemap[(077 & (NATIVE_TO_LATIN1(s[0]) >> 2))];
+	*h++ = PL_uuemap[(077 & (NATIVE_TO_LATIN1(((s[0]) << 4) & 060) | ((NATIVE_TO_LATIN1(s[1]) >> 4) & 017)))];
+	*h++ = PL_uuemap[(077 & (((NATIVE_TO_LATIN1(s[1]) << 2) & 074) | ((NATIVE_TO_LATIN1(s[2]) >> 6) & 03)))];
+	*h++ = PL_uuemap[(077 & (NATIVE_TO_LATIN1(s[2]) & 077))];
 	s += 3;
 	len -= 3;
     }
     if (len > 0) {
-        const char r = (len > 1 ? s[1] : '\0');
-	*h++ = PL_uuemap[(077 & (s[0] >> 2))];
-	*h++ = PL_uuemap[(077 & (((s[0] << 4) & 060) | ((r >> 4) & 017)))];
+        const char r = (len > 1 ? NATIVE_TO_LATIN1(s[1]) : '\0');
+	*h++ = PL_uuemap[(077 & (NATIVE_TO_LATIN1(s[0]) >> 2))];
+	*h++ = PL_uuemap[(077 & (((NATIVE_TO_LATIN1(s[0]) << 4) & 060) | ((r >> 4) & 017)))];
 	*h++ = PL_uuemap[(077 & ((r << 2) & 074))];
 	*h++ = PL_uuemap[0];
     }
