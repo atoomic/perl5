@@ -84,7 +84,7 @@ $freezed = freeze $obj[0];
 $thawed  = thaw $freezed;
 
 is($thawed->[0]->(), "JAPH");
-is($thawed->[1]->(), 42);
+is($thawed->[1]->(), (ord "A") == 193 ? -118 : 42);
 is($thawed->[2]->(), "blessed");
 is($thawed->[3]->(), "Another::Package");
 is(prototype($thawed->[4]), prototype($obj[0]->[4]));
