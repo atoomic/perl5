@@ -69,6 +69,10 @@ OUTER: foreach my $file (@files) {
 	    fail("Bad line in $file: '$_'");
 	    next OUTER;
 	}
+
+        # regen_perly is not currently run on EBCDIC platforms
+        next if !$::IS_EBCDIC && ($2 eq 'perly.y' || $2 eq 'regen_perly.pl');
+
 	my $digest = digest($2);
 	note("$digest $2");
 	push @bad, $2 unless $digest eq $1;
