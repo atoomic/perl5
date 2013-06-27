@@ -64,20 +64,19 @@ my @CLASSES = (
     # It's ok to repeat class names.
     #
     InLatin1Supplement        =>
-               $::IS_EBCDIC ? ['!\x{7f}',  '\x{80}',            '!\x{100}']
-                            : ['!\x{7f}',  '\x{80}',  '\x{ff}', '!\x{100}'],
+                            ['!\N{U+7f}',  '\N{U+80}',  '\N{U+ff}', '!\x{100}'],
     InLatinExtendedA          =>
-                            ['!\x{7f}', '!\x{80}', '!\x{ff}',  '\x{100}'],
+                            ['!\N{U+7f}', '!\N{U+80}', '!\N{U+ff}',  '\x{100}'],
 
     #
     # Properties are case-insensitive, and may have whitespace,
     # dashes and underscores.
     #
-   'in-latin1_SUPPLEMENT'     => ['\x{80}', 
+   'in-latin1_SUPPLEMENT'     => ['\N{U+80}', 
                                   '\N{LATIN SMALL LETTER Y WITH DIAERESIS}'],
    '  ^  In Latin 1 Supplement  '
-                              => ['!\x{80}', '\N{COFFIN}'],
-   'latin-1   supplement'     => ['\x{80}', "0xDF"],
+                              => ['!\N{U+80}', '\N{COFFIN}'],
+   'latin-1   supplement'     => ['\N{U+80}', "0xDF"],
 
 );
 
@@ -153,8 +152,8 @@ while (my ($class, $chars) = each %SHORT_PROPERTIES) {
     push @{$d {IsWord}}  => map {$class =~ /^[LMN]/ || $_ eq "_"
                                                      ? $_ : "!$_"} @$chars;
     push @{$d {IsSpace}} => map {$class =~ /^Z/ ||
-                                 length ($_) == 1 && ord ($_) >= 0x09
-                                                  && ord ($_) <= 0x0D
+                                 length ($_) == 1 && utf8::native_to_unicode(ord ($_)) >= 0x09
+                                                  && utf8::native_to_unicode(ord ($_)) <= 0x0D
                                                      ? $_ : "!$_"} @$chars;
 }
 
@@ -312,14 +311,28 @@ sub InNotKana {<<'--'}
 +utf8::IsCn
 --
 
-sub InConsonant {<<'--'}   # Not EBCDIC-aware.
-0061 007f
+sub InConsonant {
+
+if ($::IS_EBCDIC) {
+    my $return = "utf8::Lowercase\n&utf8::ASCII";
+    $return .= sprintf("-%X\n", ord "a");
+    $return .= sprintf("-%X\n", ord "e");
+    $return .= sprintf("-%X\n", ord "i");
+    $return .= sprintf("-%X\n", ord "o");
+    $return .= sprintf("-%X\n", ord "u");
+    return $return;
+}
+else {
+    return <<'--'
+0061 007a
 -0061
 -0065
 -0069
 -006f
 -0075
 --
+}
+}
 
 sub IsSyriac1 {<<'--'}
 0712    072C
@@ -337,10 +350,14 @@ sub IsAsciiHexAndDash {<<'--'}
 sub IsMyUpper {
     my $caseless = shift;
     if ($caseless) {
-        return "0041\t005A\n0061\t007A"
+        return ($::IS_EBCDIC)
+               ? "utf8::Alpahbetic\n&utf8::ASCII"
+               : "0041\t005A\n0061\t007A"
     }
     else {
-        return "0041\t005A"
+        return ($::IS_EBCDIC)
+               ? "utf8::Uppercase\n&utf8::ASCII"
+               : "0041\t005A"
     }
 }
 
