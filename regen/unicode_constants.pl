@@ -183,3 +183,5 @@ U+00E5 native
 U+00C5 native
 U+00FF native
 U+00B5 native
+VT   native
+ESC  native

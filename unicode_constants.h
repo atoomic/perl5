@@ -50,6 +50,8 @@
 #   define LATIN_CAPITAL_LETTER_A_WITH_RING_ABOVE_NATIVE  0xC5    /* U+00C5 */
 #   define LATIN_SMALL_LETTER_Y_WITH_DIAERESIS_NATIVE  0xFF    /* U+00FF */
 #   define MICRO_SIGN_NATIVE  0xB5    /* U+00B5 */
+#   define VT_NATIVE  0x0B    /* U+000B */
+#   define ESC_NATIVE  0x1B    /* U+001B */
 
 #endif	/* ASCII/Latin1 */
 
@@ -85,6 +87,8 @@
 #   define LATIN_CAPITAL_LETTER_A_WITH_RING_ABOVE_NATIVE  0x67    /* U+00C5 */
 #   define LATIN_SMALL_LETTER_Y_WITH_DIAERESIS_NATIVE  0xDF    /* U+00FF */
 #   define MICRO_SIGN_NATIVE  0xA0    /* U+00B5 */
+#   define VT_NATIVE  0x0B    /* U+000B */
+#   define ESC_NATIVE  0x27    /* U+001B */
 
 #endif	/* EBCDIC 1047 */
 
@@ -120,6 +124,8 @@
 #   define LATIN_CAPITAL_LETTER_A_WITH_RING_ABOVE_NATIVE  0x67    /* U+00C5 */
 #   define LATIN_SMALL_LETTER_Y_WITH_DIAERESIS_NATIVE  0xDF    /* U+00FF */
 #   define MICRO_SIGN_NATIVE  0xA0    /* U+00B5 */
+#   define VT_NATIVE  0x0B    /* U+000B */
+#   define ESC_NATIVE  0x27    /* U+001B */
 
 #endif	/* EBCDIC 037 */
 
@@ -155,6 +161,8 @@
 #   define LATIN_CAPITAL_LETTER_A_WITH_RING_ABOVE_NATIVE  0x67    /* U+00C5 */
 #   define LATIN_SMALL_LETTER_Y_WITH_DIAERESIS_NATIVE  0xDF    /* U+00FF */
 #   define MICRO_SIGN_NATIVE  0xA0    /* U+00B5 */
+#   define VT_NATIVE  0x0B    /* U+000B */
+#   define ESC_NATIVE  0x27    /* U+001B */
 
 #endif	/* EBCDIC POSIX-BC */
 
