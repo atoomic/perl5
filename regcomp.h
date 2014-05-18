@@ -756,8 +756,6 @@ struct _reg_trie_data {
 
 #define TRIE_WORDS_OFFSET 2
 
-typedef struct _reg_trie_data reg_trie_data;
-
 /* refcount is first in both this and _reg_trie_data to allow a space
    optimisation in Perl_regdupe.  */
 struct _reg_ac_data {

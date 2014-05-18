@@ -2176,6 +2176,7 @@ Es	|I32	|make_trie	|NN RExC_state_t *pRExC_state \
 				|U32 word_count|U32 flags|U32 depth
 Es	|regnode *|construct_ahocorasick_from_trie|NN RExC_state_t *pRExC_state \
                                 |NN regnode *source|U32 depth
+Es	|void	|add_wide_char_to_trie|NN RExC_state_t *pRExC_state|NN const UV * const code_point_ptr|NULLOK HV** widecharmap|NN reg_trie_data *trie|NN AV *revcharmap
 #  ifdef DEBUGGING
 Es        |void        |regdump_intflags|NULLOK const char *lead| const U32 flags
 Es	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags

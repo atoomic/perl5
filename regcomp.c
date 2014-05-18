@@ -1828,47 +1828,46 @@ is the recommended Unicode-aware way of saying
     *(d++) = uv;
 */
 
-#define TRIE_STORE_REVCHAR(val)                                            \
-    STMT_START {                                                           \
-	if (UTF) {							   \
-            SV *zlopp = newSV(7); /* XXX: optimize me */                   \
-	    unsigned char *flrbbbbb = (unsigned char *) SvPVX(zlopp);	   \
-            unsigned const char *const kapow = uvchr_to_utf8(flrbbbbb, val); \
-	    SvCUR_set(zlopp, kapow - flrbbbbb);				   \
-	    SvPOK_on(zlopp);						   \
-	    SvUTF8_on(zlopp);						   \
-	    av_push(revcharmap, zlopp);					   \
-	} else {							   \
-            char ooooff = (char)val;                                           \
-	    av_push(revcharmap, newSVpvn(&ooooff, 1));			   \
-	}								   \
-        } STMT_END
+#define TRIE_STORE_REVCHAR(cp, map)                                         \
+    STMT_START {                                                            \
+	if (UTF && ! UVCHR_IS_INVARIANT(cp)) {                              \
+            SV *revchar_sv = newSV(UNISKIP(cp) + 1);                        \
+	    U8 *rev_str = (U8 *) SvPVX(revchar_sv);                         \
+            const U8 * const e = uvchr_to_utf8(rev_str, cp);                \
+	    SvCUR_set(revchar_sv, e - rev_str);                             \
+	    SvPOK_on(revchar_sv);                                           \
+	    SvUTF8_on(revchar_sv);                                          \
+	    av_push(revcharmap, revchar_sv);                                \
+	} else {							    \
+            char addressable_cp = (char)cp;                                 \
+	    av_push(map, newSVpvn(&addressable_cp, 1));                     \
+	}                                                                   \
+    } STMT_END
 
 /* This gets the next character from the input, folding it if not already
  * folded. */
-#define TRIE_READ_CHAR STMT_START {                                           \
-    wordlen++;                                                                \
-    if ( UTF ) {                                                              \
-        /* if it is UTF then it is either already folded, or does not need    \
-         * folding */                                                         \
-        uvc = valid_utf8_to_uvchr( (const U8*) uc, &len);                     \
-    }                                                                         \
-    else if (folder == PL_fold_latin1) {                                      \
-        /* This folder implies Unicode rules, which in the range expressible  \
-         *  by not UTF is the lower case, with the two exceptions, one of     \
-         *  which should have been taken care of before calling this */       \
-        assert(*uc != LATIN_SMALL_LETTER_SHARP_S);                            \
-        uvc = toLOWER_L1(*uc);                                                \
-        if (UNLIKELY(uvc == MICRO_SIGN)) uvc = GREEK_SMALL_LETTER_MU;         \
-        len = 1;                                                              \
-    } else {                                                                  \
-        /* raw data, will be folded later if needed */                        \
-        uvc = (U32)*uc;                                                       \
-        len = 1;                                                              \
-    }                                                                         \
-} STMT_END
-
-
+#define TRIE_READ_CHAR(s, s_len, folder, cp, word_len)                       \
+ STMT_START {                                                                \
+    word_len++;                                                              \
+    if ( UTF ) {                                                             \
+        /* if it is UTF then it is either already folded, or does not need   \
+         * folding */                                                        \
+        cp = valid_utf8_to_uvchr( (const U8*) s, &s_len);                    \
+    }                                                                        \
+    else if (folder) {                                     \
+        /* XXX screwed up, why need this at all This folder implies Unicode rules, which in the range expressible \
+         *  by not UTF is the lower case, with the two exceptions, one of    \
+         *  which should have been taken care of before calling this */      \
+        assert(*s != LATIN_SMALL_LETTER_SHARP_S);                            \
+        cp = toLOWER_L1(*s);                                                 \
+        if (UNLIKELY(cp == MICRO_SIGN)) cp = GREEK_SMALL_LETTER_MU;          \
+        s_len = 1;                                                           \
+    } else {                                                                 \
+        /* raw data, will be folded later if needed */                       \
+        cp = (U32)*s;                                                        \
+        s_len = 1;                                                           \
+    }                                                                        \
+ } STMT_END
 
 #define TRIE_LIST_PUSH(state,fid,ns) STMT_START {               \
     if ( TRIE_LIST_CUR( state ) >=TRIE_LIST_LEN( state ) ) {    \
@@ -1943,6 +1942,27 @@ is the recommended Unicode-aware way of saying
 #define MADE_JUMP_TRIE  2
 #define MADE_EXACT_TRIE 4
 
+STATIC void
+S_add_wide_char_to_trie(pTHX_ RExC_state_t *pRExC_state, const UV * const code_point_ptr, HV **widecharmap, reg_trie_data *trie, AV *revcharmap)
+{
+    SV** svpp;
+
+    PERL_ARGS_ASSERT_ADD_WIDE_CHAR_TO_TRIE;
+
+    if ( !*widecharmap )
+        *widecharmap = newHV();
+
+    svpp = hv_fetch( *widecharmap, (char*)code_point_ptr, sizeof( UV ), 1 );
+
+    if ( !svpp )
+        Perl_croak( aTHX_ "error creating/fetching widecharmap entry for 0x%"UVXf, *code_point_ptr );
+
+    if ( !SvTRUE( *svpp ) ) {
+        sv_setiv( *svpp, ++trie->uniquecharcount );
+        TRIE_STORE_REVCHAR(*code_point_ptr, revcharmap);
+    }
+}
+
 STATIC I32
 S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                   regnode *first, regnode *last, regnode *tail,
@@ -1963,6 +1983,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
     U32 *prev_states; /* temp array mapping each state to previous one */
     /* we just use folder as a flag in utf8 */
     const U8 * folder = NULL;
+    bool is_mcf = TRUE /*FALSE*/;
 
 #ifdef DEBUGGING
     const U32 data_slot = add_data( pRExC_state, STR_WITH_LEN("tuuu"));
@@ -2086,7 +2107,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
         for ( ; uc < e ; uc += len ) {  /* Look at each char in the current
                                            branch */
             TRIE_CHARCOUNT(trie)++;
-            TRIE_READ_CHAR;
+            TRIE_READ_CHAR(uc, len, folder, uvc, wordlen);
 
             /* TRIE_READ_CHAR returns the current character, or its fold if /i
              * is in effect.  Under /i, this character can match itself, or
@@ -2141,10 +2162,12 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                 if (UTF) {
                     if ((foldlen = is_MULTI_CHAR_FOLD_utf8_safe(uc, e))) {
                         foldlen -= UTF8SKIP(uc);
+                        is_mcf = TRUE;
                     }
                 }
                 else if ((foldlen = is_MULTI_CHAR_FOLD_latin1_safe(uc, e))) {
                     foldlen--;
+                    is_mcf = TRUE;
                 }
             }
 
@@ -2152,16 +2175,34 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
              * to the possible matching characters for this position in this
              * branch */
             if ( uvc < 256 ) {
-                if ( folder ) {
-                    U8 folded= folder[ (U8) uvc ];
+                if ( folder && IS_IN_SOME_FOLD_L1(uvc)) {
+                    UV folded= folder[ (U8) uvc ];
                     if ( !trie->charmap[ folded ] ) {
                         trie->charmap[ folded ]=( ++trie->uniquecharcount );
-                        TRIE_STORE_REVCHAR( folded );
+                        TRIE_STORE_REVCHAR( folded, revcharmap );
+                    }
+                    if (HAS_NONLATIN1_SIMPLE_FOLD_CLOSURE(folded)
+                        && (flags != EXACTFA || ! isASCII(folded)))
+                    {
+                        UV start, end;
+                        SV* invlist = _new_invlist(2);
+                        UV save_uvc = uvc;
+
+                        add_above_Latin1_folds(pRExC_state,
+                                               (U8) folded,
+                                               &invlist);
+                        invlist_iterinit(invlist);
+                        while (invlist_iternext(invlist, &start, &end)) {
+                            for (uvc = start; uvc <= end; uvc++) {
+                                add_wide_char_to_trie(pRExC_state, &uvc, &widecharmap, trie, revcharmap);
+                            }
+                        }
+                        uvc = save_uvc;
                     }
                 }
                 if ( !trie->charmap[ uvc ] ) {
                     trie->charmap[ uvc ]=( ++trie->uniquecharcount );
-                    TRIE_STORE_REVCHAR( uvc );
+                    TRIE_STORE_REVCHAR( uvc, revcharmap );
                 }
                 if ( set_bit ) {
 		    /* store the codepoint in the bitmap, and its folded
@@ -2181,26 +2222,24 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                     set_bit = 0; /* We've done our bit :-) */
                 }
             } else {
+                add_wide_char_to_trie(pRExC_state, &uvc, &widecharmap, trie, revcharmap);
+                if (folder) {
+                    SV** listp;
+                    if (! PL_utf8_foldclosures) {
+                        _load_PL_utf8_foldclosures();
+                    }
+                    if ((listp = hv_fetch(PL_utf8_foldclosures,
+                                          (char *) uc, UTF8SKIP(uc), FALSE)))
+                    {
+                        AV* list = (AV*) *listp;
+                        IV k;
+                        for (k = 0; k <= av_tindex(list); k++) {
+                            SV** c_p = av_fetch(list, k, FALSE);
+                            uvc = SvUV(*c_p);
 
-                /* XXX We could come up with the list of code points that fold
-                 * to this using PL_utf8_foldclosures, except not for
-                 * multi-char folds, as there may be multiple combinations
-                 * there that could work, which needs to wait until runtime to
-                 * resolve (The comment about LIGATURE FFI above is such an
-                 * example */
-
-                SV** svpp;
-                if ( !widecharmap )
-                    widecharmap = newHV();
-
-                svpp = hv_fetch( widecharmap, (char*)&uvc, sizeof( UV ), 1 );
-
-                if ( !svpp )
-                    Perl_croak( aTHX_ "error creating/fetching widecharmap entry for 0x%"UVXf, uvc );
-
-                if ( !SvTRUE( *svpp ) ) {
-                    sv_setiv( *svpp, ++trie->uniquecharcount );
-                    TRIE_STORE_REVCHAR(uvc);
+                            add_wide_char_to_trie(pRExC_state, &uvc, &widecharmap, trie, revcharmap);
+                        }
+                    }
                 }
             }
         } /* end loop through characters in this branch of the trie */
@@ -2298,7 +2337,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
             if (OP(noper) != NOTHING) {
                 for ( ; uc < e ; uc += len ) {
 
-                    TRIE_READ_CHAR;
+                    TRIE_READ_CHAR(uc, len, folder, uvc, wordlen);
 
                     if ( uvc < 256 ) {
                         charid = trie->charmap[ uvc ];
@@ -2521,7 +2560,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
             if ( OP(noper) != NOTHING ) {
                 for ( ; uc < e ; uc += len ) {
 
-                    TRIE_READ_CHAR;
+                    TRIE_READ_CHAR(uc, len, folder, uvc, wordlen);
 
                     if ( uvc < 256 ) {
                         charid = trie->charmap[ uvc ];
@@ -2903,7 +2942,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch,
                 OP( convert ) = TRIE;
 
             /* store the type in the flags */
-            convert->flags = nodetype;
+            convert->flags = (is_mcf) ? nodetype : EXACT;
             DEBUG_r({
             optimize = convert
                       + NODE_STEP_REGNODE
