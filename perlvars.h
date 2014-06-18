@@ -10,9 +10,9 @@
 
 /*
 =head1 Global Variables
-
 These variables are global to an entire process.  They are shared between
-all interpreters and all threads in a process.
+all interpreters and all threads in a process.  Any variables not documented
+here may be changed or removed without notice, so don't use them!
 
 =cut
 */
