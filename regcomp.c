@@ -14019,7 +14019,7 @@ parseit:
                         element_count++;
                     } else
                         range = 1;	/* yeah, it's a range! */
-                    continue;	/* but do it the next time */
+                    continue;	/* go get the range end */
                 }
 	    }
 	}
@@ -14345,6 +14345,8 @@ parseit:
                 op = compute_EXACTish(pRExC_state);
             }
         } /* Otherwise is a range */
+#if 0
+        literal endpoint?
         else if (! LOC) {   /* locale could vary these */
             if (prevvalue == '0') {
                 if (value == '9') {
@@ -14373,6 +14375,7 @@ parseit:
                 }
             }
         }
+#endif
 
         /* Here, we have changed <op> away from its initial value iff we found
          * an optimization */
