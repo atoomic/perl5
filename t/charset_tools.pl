@@ -11,7 +11,7 @@ $::IS_EBCDIC = ord 'A' == 193;
 sub native_to_latin1($) {
     my $string = shift;
 
-    return $string if $::IS_ASCII;
+    #return $string if $::IS_ASCII;
     my $output = "";
     for my $i (0 .. length($string) - 1) {
         $output .= chr(utf8::native_to_unicode(ord(substr($string, $i, 1))));
@@ -26,7 +26,7 @@ sub native_to_latin1($) {
 sub latin1_to_native($) {
     my $string = shift;
 
-    return $string if $::IS_ASCII;
+    #return $string if $::IS_ASCII;
     my $output = "";
     for my $i (0 .. length($string) - 1) {
         $output .= chr(ord_latin1_to_native(ord(substr($string, $i, 1))));
