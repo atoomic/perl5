@@ -74,7 +74,7 @@ $foo[3] = 'c';
 $foo[4] = 'd';
 $foo[5] = 'e';
 
-$foo = delete $foo[2];
+$foo = do { no warnings 'deprecated'; delete $foo[2] };
 
 cmp_ok($foo,'eq','b','ary delete 2');
 ok(!(exists $foo[2]),'ary b absent');
@@ -83,7 +83,7 @@ cmp_ok($foo[3],'eq','c','ary c exists');
 cmp_ok($foo[4],'eq','d','ary d exists');
 cmp_ok($foo[5],'eq','e','ary e exists');
 
-@bar = delete @foo[4,5];
+@bar = do { no warnings 'deprecated'; delete @foo[4,5] };
 
 cmp_ok(scalar(@bar),'==',2,'ary deleted slice');
 cmp_ok($bar[0],'eq','d','ary slice 1');
@@ -98,6 +98,7 @@ cmp_ok($foo,'eq','ac','ary elems');
 cmp_ok(scalar(@foo),'==',4,'four is the number thou shalt count');
 
 foreach $key (0 .. $#foo) {
+    no warnings 'deprecated';
     delete $foo[$key];
 }
 
@@ -112,7 +113,10 @@ cmp_ok($foo,'eq','x y','two fresh');
 $refary[0]->[0] = "FOO";
 $refary[0]->[3] = "BAR";
 
-delete $refary[0]->[3];
+{
+    no warnings 'deprecated';
+    delete $refary[0]->[3];
+}
 
 cmp_ok( scalar(@{$refary[0]}),'==',1,'one down');
 
@@ -120,7 +124,7 @@ cmp_ok( scalar(@{$refary[0]}),'==',1,'one down');
     my @a = 33;
     my($a) = \(@a);
     my $b = \$a[0];
-    my $c = \delete $a[bar];
+    my $c = do { no warnings 'deprecated'; \delete $a[bar] };
 
     ok($a == $b && $b == $c,'a b c also equivalent');
 }
@@ -137,6 +141,7 @@ cmp_ok( scalar(@{$refary[0]}),'==',1,'one down');
     {
 	my @a;
 	$a[0] = bless [], 'X';
+        no warnings 'deprecated';
 	my $y = delete $a[0];
     }
     cmp_ok($x,'==',1,q([perl #30733] array delete didn't free returned element));

@@ -161,6 +161,7 @@ is($a[0].$a[1], "Xb");
 @a = ('a', 'b', 'c');
 $a[4] = 'd';
 {
+    no warnings 'deprecated';
     delete local $a[1];
     is(scalar(@a), 5);
     is($a[0], 'a');
@@ -301,7 +302,8 @@ is($m, 5);
     sub STORE { print "# STORE [@_]\n"; $_[0]->[$_[1]] = $_[2] }
     sub FETCH { my $v = $_[0]->[$_[1]]; print "# FETCH [@_=$v]\n"; $v }
     sub EXISTS { print "# EXISTS [@_]\n"; exists $_[0]->[$_[1]]; }
-    sub DELETE { print "# DELETE [@_]\n"; delete $_[0]->[$_[1]]; }
+    sub DELETE { print "# DELETE [@_]\n";
+                 no warnings 'deprecated'; delete $_[0]->[$_[1]]; }
     sub CLEAR { print "# CLEAR [@_]\n"; @{$_[0]} = (); }
     sub FETCHSIZE { scalar(@{$_[0]}) }
     sub SHIFT { shift (@{$_[0]}) }
@@ -392,11 +394,15 @@ is(scalar(@a), 6);
 ok(!defined $a[3]);
 ok(!defined $a[4]);
 is($a[5], 'y');
-ok(!exists $a[6]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[6]);
+}
 
 @a = ('a', 'b', 'c');
 $a[4] = 'd';
 {
+    no warnings 'deprecated';
     delete local $a[1];
     is(scalar(@a), 5);
     is($a[0], 'a');
@@ -818,8 +824,11 @@ pass ('localised arrays and hashes do not crash if glob is deleted');
 # [perl #112966] Rmagic can cause delete local to crash
 package Grompits {
 local $SIG{__WARN__};
-    delete local $ISA[0];
-    delete local @ISA[1..10];
+    {
+        no warnings 'deprecated';
+        delete local $ISA[0];
+        delete local @ISA[1..10];
+    }
     m??; # makes stash magical
     delete local $Grompits::{foo};
     delete local @Grompits::{<foo bar>};

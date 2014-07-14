@@ -93,6 +93,7 @@ if ($] >= 5.006) {
   eval << 'TESTS';
 my $del;
 $o->defer;
+no warnings 'deprecated';
 $del = delete $a[2];
 check_contents("0$:1$:2$:3$:"); # nothing happened yet
 expect($a[2], "");

@@ -96,6 +96,7 @@ for (1..3) {
     my $flag = 0;
     sub X::DESTROY { $flag = 1 }
     sub f {
+        no warnings 'deprecated';
 	delete $_[0];
 	ok(!$flag, 'delete $_[0] : in f');
     }

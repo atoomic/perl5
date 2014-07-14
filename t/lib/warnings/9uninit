@@ -418,17 +418,18 @@ use warnings 'uninitialized';
 my ($m1, @ma, %mh);
 our ($g1);
 
+no warnings 'deprecated';
 delete $ma[$m1];
 delete @ma[$m1, $g1];
 delete $mh{$m1};
 delete @mh{$m1, $g1};
 EXPECT
-Use of uninitialized value $m1 in delete at - line 5.
 Use of uninitialized value $m1 in delete at - line 6.
-Use of uninitialized value $g1 in delete at - line 6.
 Use of uninitialized value $m1 in delete at - line 7.
+Use of uninitialized value $g1 in delete at - line 7.
 Use of uninitialized value $m1 in delete at - line 8.
-Use of uninitialized value $g1 in delete at - line 8.
+Use of uninitialized value $m1 in delete at - line 9.
+Use of uninitialized value $g1 in delete at - line 9.
 ########
 use warnings 'uninitialized';
 my ($m1, @ma, %mh);

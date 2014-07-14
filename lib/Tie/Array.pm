@@ -3,7 +3,7 @@ package Tie::Array;
 use 5.006_001;
 use strict;
 use Carp;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # Pod documentation after __END__ below.
 
@@ -97,7 +97,7 @@ sub PUSH      { my $o = shift; push(@$o,@_) }
 sub SHIFT     { shift(@{$_[0]}) }
 sub UNSHIFT   { my $o = shift; unshift(@$o,@_) }
 sub EXISTS    { exists $_[0]->[$_[1]] }
-sub DELETE    { delete $_[0]->[$_[1]] }
+sub DELETE    { no warnings 'deprecated'; delete $_[0]->[$_[1]] }
 
 sub SPLICE
 {

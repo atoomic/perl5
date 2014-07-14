@@ -43,7 +43,7 @@ ok(  Internals::SvREADONLY @foo, 1 );
 ok(  Internals::SvREADONLY @foo );
 eval { undef(@foo); };
 like($@, $ro_err, q/Can't undef read-only array/);
-eval { delete($foo[2]); };
+eval { no warnings 'deprecated'; delete($foo[2]); };
 like($@, $ro_err, q/Can't delete from read-only array/);
 eval { shift(@foo); };
 like($@, $ro_err, q/Can't shift read-only array/);
@@ -90,7 +90,7 @@ eval { undef($foo[2]); };
 like($@, $ro_err, q/Can't undef read-only array element/);
 TODO: {
     local $TODO = 'Due to restricted hashes implementation';
-    eval { delete($foo[2]); };
+    eval { no warnings 'deprecated'; delete($foo[2]); };
     like($@, $ro_err, q/Can't delete read-only array element/);
 }
 

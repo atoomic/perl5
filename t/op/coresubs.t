@@ -116,16 +116,17 @@ while(<$kh>) {
 }
 
 sub inlinable_ok {
-  my ($word, $args, $desc_suffix) = @_;
+  my ($word, $args, $desc_suffix, $pragmata) = @_;
   $tests += 2;
 
   $desc_suffix //= '';
+  $pragmata //= '';
 
   for ([with => "($args)"], [without => " $args"]) {
     my ($preposition, $full_args) = @$_;
     my $core_code =
        "#line 1 This-line-makes-__FILE__-easier-to-test.
-        sub { () = (CORE::$word$full_args) }";
+        sub {$pragmata () = (CORE::$word$full_args) }";
     my $my_code = $core_code =~ s/CORE::$word/my$word/r;
     my $core = $bd->coderef2text(eval $core_code or die);
     my $my   = $bd->coderef2text(eval   $my_code or die);
@@ -168,7 +169,7 @@ for my $word (qw<keys values each>) {
     is(eval($code), 'ok', "inlined $word() on autoderef array") or diag $@;
 }
 
-inlinable_ok($_, '$1[2]', 'on array')
+inlinable_ok($_, '$1[2]', 'on array', 'no warnings "deprecated";')
     for qw<delete exists>;
 
 @UNIVERSAL::ISA = CORE;

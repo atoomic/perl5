@@ -8639,12 +8639,16 @@ Perl_ck_delete(pTHX_ OP *o)
 	OP * const kid = cUNOPo->op_first;
 	switch (kid->op_type) {
 	case OP_ASLICE:
+	    Perl_ck_warner_d(aTHX_ packWARN(WARN_DEPRECATED),
+			     "Using delete on an array slice is deprecated");
 	    o->op_flags |= OPf_SPECIAL;
 	    /* FALLTHROUGH */
 	case OP_HSLICE:
 	    o->op_private |= OPpSLICE;
 	    break;
 	case OP_AELEM:
+	    Perl_ck_warner_d(aTHX_ packWARN(WARN_DEPRECATED),
+			     "Using delete on an array element is deprecated");
 	    o->op_flags |= OPf_SPECIAL;
 	    /* FALLTHROUGH */
 	case OP_HELEM:

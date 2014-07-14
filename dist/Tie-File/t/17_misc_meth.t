@@ -69,6 +69,7 @@ my $del;
 # (21-35) DELETE
 if ($] >= 5.006) {
   eval << 'TESTS';
+no warnings 'deprecated';
 $del = delete $a[0];
 check_contents("$:$:GIVE ME PIE$:");
 # 20020317 Through 0.20, the 'delete' function returned the wrong values.

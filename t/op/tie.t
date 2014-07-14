@@ -1331,7 +1331,7 @@ sub TIEARRAY{bless[]};
 ${\tie @a, ""} = undef;
 eval { $_ = $a[-1] }; print $@;
 eval { $a[-1] = '' }; print $@;
-eval { delete $a[-1] }; print $@;
+eval { no warnings 'deprecated'; delete $a[-1] }; print $@;
 eval { exists $a[-1] }; print $@;
 
 EXPECT

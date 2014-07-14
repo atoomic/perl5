@@ -55,9 +55,9 @@ is(scalar(@test), 0, 'Didnt return anything');
 	   'result of delete(helem) is copied when explicitly returned';
     }
     my $x;
-    isnt \sub { delete $_[0] }->($x), \$x,
+    isnt \sub { no warnings 'deprecated'; delete $_[0] }->($x), \$x,
       'result of delete(aelem) is copied when returned';
-    isnt \sub { return delete $_[0] }->($x), \$x,
+    isnt \sub { no warnings 'deprecated'; return delete $_[0] }->($x), \$x,
       'result of delete(aelem) is copied when explicitly returned';
     isnt \sub { ()=\@_; shift }->($x), \$x,
       'result of shift is copied when returned';

@@ -26,6 +26,7 @@ is(reverse(), "raboof", 'reverse of the default variable');
     @a = reverse @a;
     is("@a", "4 3 2 1", 'four element array reversed');
 
+    no warnings 'deprecated';
     delete $a[1];
     @a = reverse @a;
     ok(!exists $a[2], 'array reversed with deleted second element');
@@ -59,6 +60,7 @@ use Tie::Array;
     @a = reverse @a;
     is("@a", "4 3 2 1", 'tie array reversal');
 
+    no warnings 'deprecated';
     delete $a[1];
     @a = reverse @a;
     ok(!exists $a[2], 'deleted element position ok after reversal of tie array');

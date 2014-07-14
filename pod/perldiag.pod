@@ -6450,6 +6450,35 @@ or if you meant this
 
 You need to add either braces or blanks to disambiguate.
 
+=item Using delete on an array element is deprecated
+
+=item Using delete on an array slice is deprecated
+
+(D deprecated) Using C<delete> on an element or slice of an
+array is deprecated, and will become a compile-time error in a future
+release of Perl (tentatively v5.24). The semantics of C<delete>
+on array elements is confusing and poorly defined: a deleted array
+element is not considered to exist, but the array's length continues to
+reflect the nonexistent element -- unless there are no non-deleted elements
+at higher indexes in the array, in which case the array's length does I<not>
+reflect the nonexistent elements. If you find this bizarre and
+counter-intuitive, you're not alone, which is why these constructs are now
+deprecated.
+
+Depending on what you are trying to achieve, you probably want instead to
+either assign C<undef> in place of the undesired elements, or to use
+C<splice> or C<pop> or C<shift> to remove them entirely. Then detecting
+their existence can be done by either testing for definedness or examining
+the length of the array:
+
+    Old                  New
+    ===================================
+    delete $x[17]        $x[17] = undef
+    exists $x[17]        defined $x[17]
+
+    delete $x[17]        splice @x, 17, 1
+    exists $x[17]        @x > 17
+
 =item Using just the first character returned by \N{} in character class in 
 regex; marked by S<<-- HERE> in m/%s/
 

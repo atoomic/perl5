@@ -124,6 +124,7 @@ sub DELETE {
   my ($ob,$id) = @_;
 #  print "# DELETE @_\n";
   $id += $offset;
+  no warnings 'deprecated';
   delete $ob->[$id];
 }
 
@@ -284,6 +285,7 @@ untie @ary;
   # DELETE and EXISTS
   for (-2 .. 2) {
     ok($n[$_]);
+    no warnings 'deprecated';
     delete $n[$_];
     is(defined($n[$_]), '');
     is(exists($n[$_]), '');
