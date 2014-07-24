@@ -2115,7 +2115,7 @@ PP(pp_eof)
 		    GvSV(gv) = newSVpvs("-");
 		SvSETMAGIC(GvSV(gv));
 	    }
-	    else if (!nextargv(gv))
+	    else if (!nextargv(gv, FALSE))
 		RETPUSHYES;
 	}
     }
