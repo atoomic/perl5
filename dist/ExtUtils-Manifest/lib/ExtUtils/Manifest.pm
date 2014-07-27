@@ -12,7 +12,7 @@ use warnings;
 
 use Exporter 5.57 'import';
 
-our $VERSION = '1.64';
+our $VERSION = '1.65';
 our @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
                 manifind   maniread   manicopy   maniadd
@@ -354,7 +354,7 @@ sub maniread {
 
         # filename may contain spaces if enclosed in ''
         # (in which case, \\ and \' are escapes)
-        if (($file, $comment) = /^'(\\[\\']|.+)+'\s*(.*)/) {
+        if (($file, $comment) = /^'((?:\\[\\']|.+)+)'\s*(.*)/) {
             $file =~ s/\\([\\'])/$1/g;
         }
         else {
