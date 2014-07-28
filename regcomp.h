@@ -231,8 +231,8 @@ struct regnode_ssc {
     U8  type;
     U16 next_off;
     U32 arg1;
-    char bitmap[ANYOF_BITMAP_SIZE];	/* both compile-time */
-    U32 classflags;	                /* and run-time */
+    char bitmap[ANYOF_BITMAP_SIZE];	/* both compile-time ... */
+    U32 classflags;	                /* ... and run-time */
 
     /* Auxiliary, only used during construction; NULL afterwards: list of code
      * points matched */
