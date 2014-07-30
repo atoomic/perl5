@@ -2055,10 +2055,10 @@ foreach my $Locale (@Locale) {
                             "; lc=", disp_chars(($y)), "; ",
                             "; fc=", disp_chars((fc $x)), "; ",
                             disp_chars(($x)), "=~/", disp_chars(($y)), "/i=",
-                            $x =~ /$y/i ? 1 : 0,
+                            $x =~ /\Q$y/i ? 1 : 0,
                             "; ",
                             disp_chars(($y)), "=~/", disp_chars(($x)), "/i=",
-                            $y =~ /$x/i ? 1 : 0,
+                            $y =~ /\Q$x/i ? 1 : 0,
                             "\n");
                 #
                 # If $x and $y contain regular expression characters

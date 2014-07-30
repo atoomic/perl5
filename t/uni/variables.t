@@ -80,12 +80,22 @@ for ( 0x80..0xff ) {
             10,
             sprintf("\\x%02x, part of the latin-1 range, is legal as a length-1 variable", $_);
 
+      SKIP: {
+        # On EBCDIC platforms, some of the C1 controls map to the range 0..31,
+        # and Perl accepts any length-1 variable in that range no matter the
+        # platform and UTF-8 or not.  Thus the next test would fail, so skip
+        # it.  Note that on ASCII platforms $chr will always be > 127,
+        # hence > 32.  XXX There probably should be an alternate test for
+        # these
+        skip("EBCDIC ords < 32 should pass", 1) if ord $chr < 32;
+
         utf8::upgrade($chr);
         local $@;
         eval "no strict; use utf8; \$$chr = 1";
         like $@,
             qr/\QUnrecognized character \x{\E\L$esc/,
             sprintf("..but is illegal as a length-1 variable under use utf8", $_);
+        }
     }
     else {
         {

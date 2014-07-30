@@ -340,20 +340,35 @@ EXPECT
 OPTIONS regex
 PADDING CHARACTER
 ########
-# NAME various wrong characters in :alias are errors
-# Below, one of the EXPECT regexes matches both the UTF-8 and non-UTF-8 form.
-# This is because under some circumstances the message gets output as UTF-8.
-# We use \xab, as that is invalid in both ASCII and EBCDIC platforms, and we
-# accept both UTF-8 and 1047 UTF-EBCDIC
+# NAME A wrong character in :alias is an error
+# These next tests could be combined, but the messages can come out in
+# different orders on EBCDIC vs ASCII, and can't have both 'random' and 'regex'
+# options, and need 'regex' to avoid 'at line X' getting in the way.
 use charnames ":full", ":alias" => {
                             "4e_ACUTE" => "LATIN SMALL LETTER E WITH ACUTE",
-                            "e_A,CUTE" => "LATIN SMALL LETTER E WITH ACUTE",
-                            "e_ACUT\x{ab}E" => "LATIN SMALL LETTER E WITH ACUTE",
                     };
 EXPECT
 OPTIONS regex
 Invalid character in charnames alias definition; marked by <-- HERE in '4<-- HERE e_ACUTE'
+########
+# NAME Another wrong character in :alias is an error
+use charnames ":full", ":alias" => {
+                            "e_A,CUTE" => "LATIN SMALL LETTER E WITH ACUTE",
+                    };
+EXPECT
+OPTIONS regex
 Invalid character in charnames alias definition; marked by <-- HERE in 'e_A,<-- HERE CUTE'
+########
+# NAME Another wrong character in :alias is an error
+# The EXPECT regex matches both the UTF-8 and non-UTF-8 form.
+# This is because under some circumstances the message gets output as UTF-8.
+# We use \xab, as that is invalid in both ASCII and EBCDIC platforms, and we
+# accept both UTF-8 and 1047 UTF-EBCDIC.
+use charnames ":full", ":alias" => {
+                            "e_ACUT\x{ab}E" => "LATIN SMALL LETTER E WITH ACUTE",
+                    };
+EXPECT
+OPTIONS regex
 Invalid character in charnames alias definition; marked by <-- HERE in 'e_ACUT(?:\x{ab}|\x{C2}\x{AB}|\x{80\x{73})<-- HERE E'
 ########
 # RT#73022

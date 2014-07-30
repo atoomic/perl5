@@ -394,7 +394,7 @@ is($failed, undef);
 SKIP: {
     skip "no PerlIO::scalar on miniperl", 2, if is_miniperl();
     open my $fh, "<:raw",  \($buf = chr 255);
-    open my $uh, "<:utf8", \($uuf = "\xc4\x80");
+    open my $uh, "<:utf8", \($uuf = $U_100);
     for([$uh,chr 256], [$fh,chr 255]) {
 	is getc $$_[0], $$_[1],
 	  'getc returning non-utf8 after utf8';
