@@ -11392,23 +11392,6 @@ tryagain:
             arg = ANYOF_WORDCHAR;
             goto join_posix;
 
-	case 'b':
-	    RExC_seen_zerolen++;
-            RExC_seen |= REG_LOOKBEHIND_SEEN;
-	    op = BOUND + get_regex_charset(RExC_flags);
-            if (op > BOUNDA) {  /* /aa is same as /a */
-                op = BOUNDA;
-            }
-            else if (op == BOUNDL) {
-                RExC_contains_locale = 1;
-            }
-	    ret = reg_node(pRExC_state, op);
-	    *flagp |= SIMPLE;
-	    if (! SIZE_ONLY && (U8) *(RExC_parse + 1) == '{') {
-                /* diag_listed_as: Use "%s" instead of "%s" */
-	        vFAIL("Use \"\\b\\{\" instead of \"\\b{\"");
-	    }
-	    goto finish_meta_pat;
 	case 'B':
 	    RExC_seen_zerolen++;
             RExC_seen |= REG_LOOKBEHIND_SEEN;
@@ -11424,6 +11407,24 @@ tryagain:
 	    if (! SIZE_ONLY && (U8) *(RExC_parse + 1) == '{') {
                 /* diag_listed_as: Use "%s" instead of "%s" */
 	        vFAIL("Use \"\\B\\{\" instead of \"\\B{\"");
+	    }
+	    goto finish_meta_pat;
+
+	case 'b':
+	    RExC_seen_zerolen++;
+            RExC_seen |= REG_LOOKBEHIND_SEEN;
+	    op = BOUND + get_regex_charset(RExC_flags);
+            if (op > BOUNDA) {  /* /aa is same as /a */
+                op = BOUNDA;
+            }
+            else if (op == BOUNDL) {
+                RExC_contains_locale = 1;
+            }
+	    ret = reg_node(pRExC_state, op);
+	    *flagp |= SIMPLE;
+	    if (! SIZE_ONLY && (U8) *(RExC_parse + 1) == '{') {
+                /* diag_listed_as: Use "%s" instead of "%s" */
+	        vFAIL("Use \"\\b\\{\" instead of \"\\b{\"");
 	    }
 	    goto finish_meta_pat;
 
