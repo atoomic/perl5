@@ -11403,7 +11403,6 @@ tryagain:
                 RExC_contains_locale = 1;
             }
 	    ret = reg_node(pRExC_state, op);
-	    FLAGS(ret) = get_regex_charset(RExC_flags);
 	    *flagp |= SIMPLE;
 	    if (! SIZE_ONLY && (U8) *(RExC_parse + 1) == '{') {
                 /* diag_listed_as: Use "%s" instead of "%s" */
@@ -11421,7 +11420,6 @@ tryagain:
                 RExC_contains_locale = 1;
             }
 	    ret = reg_node(pRExC_state, op);
-	    FLAGS(ret) = get_regex_charset(RExC_flags);
 	    *flagp |= SIMPLE;
 	    if (! SIZE_ONLY && (U8) *(RExC_parse + 1) == '{') {
                 /* diag_listed_as: Use "%s" instead of "%s" */
