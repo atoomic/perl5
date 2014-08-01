@@ -43,6 +43,7 @@
 #   define NBSP_UTF8  "\xC2\xA0"    /* U+00A0 */
 
 #   define DEL_NATIVE  0x7F    /* U+007F */
+#   define ESC_NATIVE  0x1B    /* U+001B */
 #   define CR_NATIVE  0x0D    /* U+000D */
 #   define LF_NATIVE  0x0A    /* U+000A */
 #   define LATIN_SMALL_LETTER_SHARP_S_NATIVE  0xDF    /* U+00DF */
@@ -78,6 +79,7 @@
 #   define NBSP_UTF8  "\x80\x41"    /* U+00A0 */
 
 #   define DEL_NATIVE  0x07    /* U+007F */
+#   define ESC_NATIVE  0x27    /* U+001B */
 #   define CR_NATIVE  0x0D    /* U+000D */
 #   define LF_NATIVE  0x15    /* U+000A */
 #   define LATIN_SMALL_LETTER_SHARP_S_NATIVE  0x59    /* U+00DF */
@@ -113,6 +115,7 @@
 #   define NBSP_UTF8  "\x78\x41"    /* U+00A0 */
 
 #   define DEL_NATIVE  0x07    /* U+007F */
+#   define ESC_NATIVE  0x27    /* U+001B */
 #   define CR_NATIVE  0x0D    /* U+000D */
 #   define LF_NATIVE  0x25    /* U+000A */
 #   define LATIN_SMALL_LETTER_SHARP_S_NATIVE  0x59    /* U+00DF */
@@ -148,6 +151,7 @@
 #   define NBSP_UTF8  "\x8A\x41"    /* U+00A0 */
 
 #   define DEL_NATIVE  0x07    /* U+007F */
+#   define ESC_NATIVE  0x27    /* U+001B */
 #   define CR_NATIVE  0x0D    /* U+000D */
 #   define LF_NATIVE  0x15    /* U+000A */
 #   define LATIN_SMALL_LETTER_SHARP_S_NATIVE  0x59    /* U+00DF */

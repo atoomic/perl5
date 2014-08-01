@@ -176,6 +176,7 @@ NBSP native
 NBSP string
 
 DEL native
+ESC native
 CR  native
 LF  native
 U+00DF native
