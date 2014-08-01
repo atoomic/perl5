@@ -8787,8 +8787,14 @@ Perl_ck_exists(pTHX_ OP *o)
 			  "exists argument is not a subroutine name");
 	    o->op_private |= OPpEXISTS_SUB;
 	}
-	else if (kid->op_type == OP_AELEM)
+	else if (kid->op_type == OP_AELEM) {
+            /* When honouring this deprecation by deleting this code, please
+             * remember to remove the comment in op.h that documents this use
+             * of OPf_SPECIAL. */
+            Perl_ck_warner_d(aTHX_ packWARN(WARN_DEPRECATED),
+                             "Using exists on an array element is deprecated");
 	    o->op_flags |= OPf_SPECIAL;
+        }
 	else if (kid->op_type != OP_HELEM)
 	    Perl_croak(aTHX_ "exists argument is not a HASH or ARRAY "
 			     "element or a subroutine");

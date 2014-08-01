@@ -6454,10 +6454,12 @@ You need to add either braces or blanks to disambiguate.
 
 =item Using delete on an array slice is deprecated
 
-(D deprecated) Using C<delete> on an element or slice of an
+=item Using exists on an array element is deprecated
+
+(D deprecated) Using C<delete> or C<exists> on an element or slice of an
 array is deprecated, and will become a compile-time error in a future
-release of Perl (tentatively v5.24). The semantics of C<delete>
-on array elements is confusing and poorly defined: a deleted array
+release of Perl (tentatively v5.24). The semantics of C<delete> and
+C<exists> on array elements is confusing and poorly defined: a deleted array
 element is not considered to exist, but the array's length continues to
 reflect the nonexistent element -- unless there are no non-deleted elements
 at higher indexes in the array, in which case the array's length does I<not>

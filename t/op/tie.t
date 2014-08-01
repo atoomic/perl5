@@ -1316,6 +1316,7 @@ sub TIEARRAY{bless[]};
 sub FETCHSIZE { 50 }
 sub EXISTS { print "does $_[1] exist?\n" }
 tie @a, "";
+no warnings 'deprecated';
 exists $a[1];
 exists $a[-1];
 $NEGATIVE_INDICES=1;
@@ -1332,7 +1333,7 @@ ${\tie @a, ""} = undef;
 eval { $_ = $a[-1] }; print $@;
 eval { $a[-1] = '' }; print $@;
 eval { no warnings 'deprecated'; delete $a[-1] }; print $@;
-eval { exists $a[-1] }; print $@;
+eval { no warnings 'deprecated'; exists $a[-1] }; print $@;
 
 EXPECT
 Can't call method "FETCHSIZE" on an undefined value at - line 5.

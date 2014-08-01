@@ -29,6 +29,7 @@ $N++;
 if ($] >= 5.006) {
   eval << 'TESTS';
 $o->defer;
+no warnings 'deprecated';
 expect(not exists $a[4]);
 $a[4] = "rec4";
 expect(exists $a[4]);

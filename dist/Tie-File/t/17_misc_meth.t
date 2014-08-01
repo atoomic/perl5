@@ -33,6 +33,7 @@ check_contents("");
 # (11-20) EXISTS
 if ($] >= 5.006) {
   eval << 'TESTS';
+no warnings 'deprecated';
 print !exists $a[0] ? "ok $N\n" : "not ok $N\n";
 $N++;
 $a[0] = "I like pie.";

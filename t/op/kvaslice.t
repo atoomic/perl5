@@ -29,6 +29,7 @@ plan tests => 40;
     ok( eq_hash( { %a[3..4] }, { 3 => 'd', 4 => undef } ),
         "not existing returned with undef value" );
 
+    no warnings 'deprecated';
     ok( !exists $a[5], "no autovivification" );
 }
 
@@ -175,6 +176,7 @@ plan tests => 40;
     ok( eq_array( [%a[1,2, 3]], [qw(1 b 2 c 3), undef] ),
         "works on tied" );
 
+    no warnings 'deprecated';
     ok( !exists $a[3], "no autovivification" );
 }
 

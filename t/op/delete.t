@@ -77,7 +77,7 @@ $foo[5] = 'e';
 $foo = do { no warnings 'deprecated'; delete $foo[2] };
 
 cmp_ok($foo,'eq','b','ary delete 2');
-ok(!(exists $foo[2]),'ary b absent');
+ok(do { no warnings 'deprecated'; !(exists $foo[2]) },'ary b absent');
 cmp_ok($foo[1],'eq','a','ary a exists');
 cmp_ok($foo[3],'eq','c','ary c exists');
 cmp_ok($foo[4],'eq','d','ary d exists');
@@ -88,8 +88,8 @@ cmp_ok($foo[5],'eq','e','ary e exists');
 cmp_ok(scalar(@bar),'==',2,'ary deleted slice');
 cmp_ok($bar[0],'eq','d','ary slice 1');
 cmp_ok($bar[1],'eq','e','ary slice 2');
-ok(!(exists $foo[4]),'ary d absent');
-ok(!(exists $foo[5]),'ary e absent');
+ok(do { no warnings 'deprecated'; !(exists $foo[4]) },'ary d absent');
+ok(do { no warnings 'deprecated'; !(exists $foo[5]) },'ary e absent');
 cmp_ok($foo[1],'eq','a','ary a still exists');
 cmp_ok($foo[3],'eq','c','ary c still exists');
 

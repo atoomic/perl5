@@ -261,6 +261,7 @@ sub unwrap {
 
 	if ($compactDump && !grep(ref $_, @{$v})) {
 	  if ($#$v >= 0) {
+            no warnings 'deprecated';
 	    $short = $sp . "0..$#{$v}  " . 
 	      join(" ", 
 		   map {exists $v->[$_] ? stringify $v->[$_] : "empty"} (0..$tArrayDepth)
@@ -277,7 +278,7 @@ sub unwrap {
 	for $num (0 .. $tArrayDepth) {
 	    return if $DB::signal;
 	    print "$sp$num  ";
-	    if (exists $v->[$num]) {
+	    if (do { no warnings 'deprecated'; exists $v->[$num] }) {
                 if (defined $v->[$num]) {
 	          DumpElem $v->[$num], $s, $m-1;
                 } 

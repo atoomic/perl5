@@ -463,6 +463,7 @@ package peen {
 
 # Test that &PL_sv_undef is not special in arrays
 sub {
+    no warnings 'deprecated';
     ok exists $_[0],
       'exists returns true for &PL_sv_undef elem [perl #7508]';
     is \$_[0], \undef, 'undef preserves identity in array [perl #109726]';

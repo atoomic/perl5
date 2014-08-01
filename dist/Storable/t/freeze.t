@@ -128,6 +128,7 @@ SKIP: {
     eval '
         $a = []; $#$a = 2; $a->[1] = undef;
         $b = thaw freeze $a;
+        no warnings "deprecated";
         @a = map { ~~ exists $a->[$_] } 0 .. $#$a;
         @b = map { ~~ exists $b->[$_] } 0 .. $#$b;
     ';

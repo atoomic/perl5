@@ -1,7 +1,7 @@
 use 5.006_001;			# for (defined ref) and $#$v and our
 package Dumpvalue;
 use strict;
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 our(%address, $stab, @stab, %stab, %subs);
 
 # documentation nits, handle complex data structures better by chromatic
@@ -228,6 +228,7 @@ sub unwrap {
     $shortmore = " ..." if $tArrayDepth < $#{$v} ;
     if ($self->{compactDump} && !grep(ref $_, @{$v})) {
       if ($#$v >= 0) {
+	no warnings 'deprecated';
 	$short = $sp . "0..$#{$v}  " .
 	  join(" ", 
 	       map {exists $v->[$_] ? $self->stringify($v->[$_]) : "empty"} (0..$tArrayDepth)
@@ -240,7 +241,7 @@ sub unwrap {
     for my $num (0 .. $tArrayDepth) {
       return if $DB::signal and $self->{stopDbSignal};
       print "$sp$num  ";
-      if (exists $v->[$num]) {
+      if (do { no warnings 'deprecated'; exists $v->[$num] }) {
         $self->DumpElem($v->[$num], $s);
       } else {
 	print "empty slot\n";

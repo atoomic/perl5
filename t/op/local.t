@@ -101,8 +101,11 @@ ok(!defined $a[0]);
     is($a[4], 'x');
 }
 is(scalar(@a), 3);
-ok(!exists $a[3]);
-ok(!exists $a[4]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[3]);
+    ok(!exists $a[4]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -115,7 +118,10 @@ ok(!exists $a[4]);
 is(scalar(@a), 5);
 ok(!defined $a[3]);
 is($a[4], 'y');
-ok(!exists $a[5]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[5]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -126,10 +132,13 @@ ok(!exists $a[5]);
     is($a[6], 'z');
 }
 is(scalar(@a), 3);
-ok(!exists $a[3]);
-ok(!exists $a[4]);
-ok(!exists $a[5]);
-ok(!exists $a[6]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[3]);
+    ok(!exists $a[4]);
+    ok(!exists $a[5]);
+    ok(!exists $a[6]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -144,7 +153,10 @@ is(scalar(@a), 6);
 ok(!defined $a[3]);
 ok(!defined $a[4]);
 is($a[5], 'y');
-ok(!exists $a[6]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[6]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -197,9 +209,12 @@ is($a[1], 'b');
 is($a[2], 'c');
 ok(!defined($a[3]));
 is($a[4], 'd');
-ok(!exists($a[5]));
-ok(!exists($a[888]));
-ok(!exists($a[999]));
+{
+    no warnings 'deprecated';
+    ok(!exists($a[5]));
+    ok(!exists($a[888]));
+    ok(!exists($a[999]));
+}
 
 %h = (a => 1, b => 2, c => 3, d => 4);
 {
@@ -301,7 +316,8 @@ is($m, 5);
     sub TIEARRAY { bless [], $_[0] }
     sub STORE { print "# STORE [@_]\n"; $_[0]->[$_[1]] = $_[2] }
     sub FETCH { my $v = $_[0]->[$_[1]]; print "# FETCH [@_=$v]\n"; $v }
-    sub EXISTS { print "# EXISTS [@_]\n"; exists $_[0]->[$_[1]]; }
+    sub EXISTS { print "# EXISTS [@_]\n";
+                 no warnings 'deprecated'; exists $_[0]->[$_[1]]; }
     sub DELETE { print "# DELETE [@_]\n";
                  no warnings 'deprecated'; delete $_[0]->[$_[1]]; }
     sub CLEAR { print "# CLEAR [@_]\n"; @{$_[0]} = (); }
@@ -351,8 +367,11 @@ is("@a", "a b c", '@a should now contain original value');
     is($a[4], 'x');
 }
 is(scalar(@a), 3);
-ok(!exists $a[3]);
-ok(!exists $a[4]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[3]);
+    ok(!exists $a[4]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -365,7 +384,10 @@ ok(!exists $a[4]);
 is(scalar(@a), 5);
 ok(!defined $a[3]);
 is($a[4], 'y');
-ok(!exists $a[5]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[5]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -376,10 +398,13 @@ ok(!exists $a[5]);
     is($a[6], 'z');
 }
 is(scalar(@a), 3);
-ok(!exists $a[3]);
-ok(!exists $a[4]);
-ok(!exists $a[5]);
-ok(!exists $a[6]);
+{
+    no warnings 'deprecated';
+    ok(!exists $a[3]);
+    ok(!exists $a[4]);
+    ok(!exists $a[5]);
+    ok(!exists $a[6]);
+}
 
 @a = ('a', 'b', 'c');
 {
@@ -438,9 +463,12 @@ is($a[1], 'b');
 is($a[2], 'c');
 ok(!defined($a[3]));
 is($a[4], 'd');
-ok(!exists($a[5]));
-ok(!exists($a[888]));
-ok(!exists($a[999]));
+{
+    no warnings 'deprecated';
+    ok(!exists($a[5]));
+    ok(!exists($a[888]));
+    ok(!exists($a[999]));
+}
 
 # see if localization works on tied hashes
 {
@@ -803,10 +831,13 @@ ok !exists $Flibbert::{foo},
   'local helem on magic hash does not leave elems on scope exit';
 ok !exists $Flibbert::{bar},
   'local hslice on magic hash does not leave elems on scope exit';
-ok !exists $squinch[0],
-  'local aelem on magic hash does not leave elems on scope exit';
-ok !exists $squinch[1],
-  'local aslice on magic hash does not leave elems on scope exit';
+{
+    no warnings 'deprecated';
+    ok !exists $squinch[0],
+        'local aelem on magic hash does not leave elems on scope exit';
+    ok !exists $squinch[1],
+        'local aslice on magic hash does not leave elems on scope exit';
+}
 
 # Keep these tests last, as they can SEGV
 {

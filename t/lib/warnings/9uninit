@@ -450,15 +450,16 @@ use warnings 'uninitialized';
 my ($m1, @ma, %mh, $v);
 our ($g1, @ga, %gh);
 
+no warnings 'deprecated';
 $v = exists $ma[$m1];
 $v = exists $ga[$g1];
 $v = exists $mh{$m1};
 $v = exists $gh{$g1};
 EXPECT
-Use of uninitialized value $m1 in exists at - line 5.
-Use of uninitialized value $g1 in exists at - line 6.
-Use of uninitialized value $m1 in exists at - line 7.
-Use of uninitialized value $g1 in exists at - line 8.
+Use of uninitialized value $m1 in exists at - line 6.
+Use of uninitialized value $g1 in exists at - line 7.
+Use of uninitialized value $m1 in exists at - line 8.
+Use of uninitialized value $g1 in exists at - line 9.
 ########
 use warnings 'uninitialized';
 my ($m1, $m2);

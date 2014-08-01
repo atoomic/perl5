@@ -132,6 +132,7 @@ sub EXISTS {
   my ($ob,$id) = @_;
 #  print "# EXISTS @_\n";
   $id += $offset;
+  no warnings 'deprecated';
   exists $ob->[$id];
 }
 

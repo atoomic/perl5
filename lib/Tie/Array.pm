@@ -96,7 +96,7 @@ sub POP       { pop(@{$_[0]}) }
 sub PUSH      { my $o = shift; push(@$o,@_) }
 sub SHIFT     { shift(@{$_[0]}) }
 sub UNSHIFT   { my $o = shift; unshift(@$o,@_) }
-sub EXISTS    { exists $_[0]->[$_[1]] }
+sub EXISTS    { no warnings 'deprecated'; exists $_[0]->[$_[1]] }
 sub DELETE    { no warnings 'deprecated'; delete $_[0]->[$_[1]] }
 
 sub SPLICE

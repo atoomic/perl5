@@ -659,18 +659,21 @@ sub run_tests {
            !defined $+ [4] && !defined $- [4], $message);
 
         # Exists has a special check for @-/@+ - bug 45147
-        ok(exists $-[0], $message);
-        ok(exists $+[0], $message);
-        ok(exists $-[2], $message);
-        ok(exists $+[2], $message);
-        ok(!exists $-[3], $message);
-        ok(!exists $+[3], $message);
-        ok(exists $-[-1], $message);
-        ok(exists $+[-1], $message);
-        ok(exists $-[-3], $message);
-        ok(exists $+[-3], $message);
-        ok(!exists $-[-4], $message);
-        ok(!exists $+[-4], $message);
+        {
+            no warnings 'deprecated'; # for "exists" on an array element
+            ok(exists $-[0], $message);
+            ok(exists $+[0], $message);
+            ok(exists $-[2], $message);
+            ok(exists $+[2], $message);
+            ok(!exists $-[3], $message);
+            ok(!exists $+[3], $message);
+            ok(exists $-[-1], $message);
+            ok(exists $+[-1], $message);
+            ok(exists $-[-3], $message);
+            ok(exists $+[-3], $message);
+            ok(!exists $-[-4], $message);
+            ok(!exists $+[-4], $message);
+        }
 
         /.(a)(b)?(a)/;
         is($#+, 3, $message);

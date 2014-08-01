@@ -4783,7 +4783,7 @@ PP(pp_exists)
 	    RETPUSHYES;
     }
     else if (SvTYPE(hv) == SVt_PVAV) {
-	if (PL_op->op_flags & OPf_SPECIAL) {		/* array element */
+	if (PL_op->op_flags & OPf_SPECIAL) {			/* array element */
 	    if (av_exists(MUTABLE_AV(hv), SvIV(tmpsv)))
 		RETPUSHYES;
 	}
