@@ -29,8 +29,8 @@ my %args_for = (
   keys     =>
   values   =>
   each     =>)[0,1,2,1,3,1,4,1],
-  delete   => '$1[2]',
-  exists   => '$1[2]',
+  delete   => '$1{k}',
+  exists   => '$1{k}',
  (push     => '@1',
   pop      =>
   shift    =>
@@ -168,7 +168,7 @@ for my $word (qw<keys values each>) {
     is(eval($code), 'ok', "inlined $word() on autoderef array") or diag $@;
 }
 
-inlinable_ok($_, '$_{k}', 'on hash')
+inlinable_ok($_, '$1[2]', 'on array')
     for qw<delete exists>;
 
 @UNIVERSAL::ISA = CORE;
