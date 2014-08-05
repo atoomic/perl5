@@ -2191,7 +2191,7 @@ Es	|void	|put_byte	|NN SV* sv|int c
 Es	|bool	|put_latin1_charclass_innards|NN SV* sv	    \
 				|NN char* bitmap	    \
 				|NULLOK SV** bitmap_invlist
-Es	|void	|put_range	|NN SV* sv|UV start|UV end
+Es	|void	|put_range	|NN SV* sv|UV start|const UV end|const bool force_hex
 Es	|void	|dump_trie	|NN const struct _reg_trie_data *trie\
 				|NULLOK HV* widecharmap|NN AV *revcharmap\
 				|U32 depth

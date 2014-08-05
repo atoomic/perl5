@@ -11927,7 +11927,7 @@ tryagain:
 			p++;
 			break;
 		    case 'a':
-			  ender = '\a';
+			ender = '\a';
 			p++;
 			break;
 		    case 'o':
@@ -16082,7 +16082,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o, const regmatch_
                     invlist_iterinit(only_utf8_locale);
                     while (invlist_iternext(only_utf8_locale,
                                             &start, &end)) {
-                        put_range(sv, start, end);
+                        put_range(sv, start, end, FALSE);
                         max_entries --;
                         if (max_entries < 0) {
                             sv_catpvs(sv, "...");
@@ -16718,6 +16718,13 @@ Perl_save_re_context(pTHX)
 
 #ifdef DEBUGGING
 
+/* Is the input an ASCII control character that we have a mnemonic for?.  Note
+ * this must be called after ruling out 'c' being isPRINT */
+#define isCNTRL_PRINT(c) (isSPACE_A(c)          \
+                          || (c) == '\a'        \
+                          || (c) == '\b'        \
+                          || (c) == ESC_NATIVE)
+
 STATIC void
 S_put_byte(pTHX_ SV *sv, int c)
 {
@@ -16726,13 +16733,18 @@ S_put_byte(pTHX_ SV *sv, int c)
     if (!isPRINT(c)) {
         switch (c) {
             case '\a': Perl_sv_catpvf(aTHX_ sv, "\\a"); break;
+            case '\b': Perl_sv_catpvf(aTHX_ sv, "\\b"); break;
+            case ESC_NATIVE: Perl_sv_catpvf(aTHX_ sv, "\\e"); break;
             case '\f': Perl_sv_catpvf(aTHX_ sv, "\\f"); break;
             case '\n': Perl_sv_catpvf(aTHX_ sv, "\\n"); break;
             case '\r': Perl_sv_catpvf(aTHX_ sv, "\\r"); break;
             case '\t': Perl_sv_catpvf(aTHX_ sv, "\\t"); break;
 
+                 /* \cK works for VT in both ASCII and EBCDIC */
+            case '\v': Perl_sv_catpvf(aTHX_ sv, "\\cK"); break;
+
             default:
-                Perl_sv_catpvf(aTHX_ sv, "\\x{%x}", c);
+                Perl_sv_catpvf(aTHX_ sv, "\\x{%X}", c);
                 break;
         }
     }
@@ -16745,7 +16757,7 @@ S_put_byte(pTHX_ SV *sv, int c)
 }
 
 STATIC void
-S_put_range(pTHX_ SV *sv, UV start, UV end)
+S_put_range(pTHX_ SV *sv, UV start, const UV end, const bool force_hex)
 {
 
     /* Appends to 'sv' a displayable version of the range of code points from
@@ -16769,28 +16781,8 @@ S_put_range(pTHX_ SV *sv, UV start, UV end)
          * larger ranges that include more than printables, it's probably
          * clearer to just give the start and end points of the range in hex,
          * and that's all we can do if there aren't any printables within the
-         * range
-         *
-         * On ASCII platforms the range of printables is contiguous.  If the
-         * entire range is printable, we print each character as such.  If the
-         * range is partially printable and partially not, it's less likely
-         * that the individual printables are meaningful, especially if all or
-         * almost all of them are in the range.  But we err on the side of the
-         * individual printables being meaningful by using the hex only if the
-         * range contains all but 2 of the printables.
-         *
-         * On EBCDIC platforms, the printables are scattered around so that the
-         * maximum range length containing only them is about 10.  Anything
-         * longer we treat as hex; otherwise we examine the range character by
-         * character to see */
-#ifdef EBCDIC
-        if (start < 256 && (((end < 255) ? end : 255) - start <= 10))
-#else
-        if ((isPRINT_A(start) && isPRINT_A(end))
-            || (end >= 0x7F && (isPRINT_A(start) && start > 0x21))
-            || ((end < 0x7D && isPRINT_A(end)) && start < 0x20))
-#endif
-        {
+         * range */
+        if (! force_hex) {
             /* If the range beginning isn't an ASCII printable, we find the
              * last such in the range, then split the output, so all the
              * non-printables are in one subrange; then process the remaining
@@ -16802,7 +16794,7 @@ S_put_range(pTHX_ SV *sv, UV start, UV end)
                     temp_end++;
                 }
                 if (temp_end <= end) {
-                    put_range(sv, start, temp_end - 1);
+                    put_range(sv, start, temp_end - 1, force_hex);
                     start = temp_end;
                     continue;
                 }
@@ -16840,8 +16832,37 @@ S_put_range(pTHX_ SV *sv, UV start, UV end)
             }
         }
 
-        /* Here is a control or non-ascii.  Output the range or subrange as
-         * hex. */
+        /* Here is a control or non-ascii.  As a special case, if the entire
+         * range are ASCII space characters (all of which have mnemonic names), output
+         * them as such. */  
+        if (isCNTRL_PRINT(start)) {
+            while (isCNTRL_PRINT(start) && start <= end) {
+                put_byte(sv, start);
+                start++;
+            }
+            if (start < end) {
+                put_range(sv, start, end, force_hex);
+            }
+            break;
+        }
+        if (start < end && isCNTRL_PRINT(end)) {
+            UV temp_end = end - 1;
+            while (isCNTRL_PRINT(temp_end)) {
+                temp_end--;
+            }
+            put_range(sv, start, temp_end, force_hex);
+            start = temp_end + 1;
+            while (start <= end) {
+                put_byte(sv, start);
+                start++;
+            }
+            if (start < end) {
+                put_range(sv, start, end, force_hex);
+            }
+            break;
+        }
+        
+        /* As a final resort, output the range or subrange as hex. */
         Perl_sv_catpvf(aTHX_ sv, "\\x{%02" UVXf "}-\\x{%02" UVXf "}",
                        start,
                        (end < NUM_ANYOF_CODE_POINTS)
@@ -16860,43 +16881,91 @@ S_put_latin1_charclass_innards(pTHX_ SV *sv, char *bitmap, SV** bitmap_invlist)
      * inversion list of what is in the bit map */
 
     int i;
-    bool has_output_anything = FALSE;
+    UV start, end;
+    unsigned int punct_count = 0;
+    SV* invlist = NULL;
+    SV** invlist_ptr;
+    bool force_hex = FALSE;
 
     PERL_ARGS_ASSERT_PUT_LATIN1_CHARCLASS_INNARDS;
 
-    if (bitmap_invlist) {
-        *bitmap_invlist = _new_invlist(128);  /* worst case is exactly
-                                                 every-other code point is in
-                                                 the list */
-    }
+    invlist_ptr = (bitmap_invlist) ? bitmap_invlist : &invlist;
+    *invlist_ptr = _new_invlist(128);  /* worst case is exactly every-other
+                                             code point is in the list */
+
+    /* Convert the bit map to an inversion list, keeping track of how many
+     * ASCII puncts are set */
     for (i = 0; i < NUM_ANYOF_CODE_POINTS; i++) {
         if (BITMAP_TEST((U8 *) bitmap,i)) {
-            int j;
-
-            if (bitmap_invlist) {
-                *bitmap_invlist = add_cp_to_invlist(*bitmap_invlist, i);
+            *invlist_ptr = add_cp_to_invlist(*invlist_ptr, i);
+            if (isPUNCT_A(i)) {
+                punct_count++;
             }
-
-            /* The character at index i should be output.  Find the next
-             * character that should NOT be output */
-            for (j = i + 1; j < NUM_ANYOF_CODE_POINTS; j++) {
-                if (! BITMAP_TEST((U8 *) bitmap, j)) {
-                    break;
-                }
-                if (bitmap_invlist) {
-                    *bitmap_invlist = add_cp_to_invlist(*bitmap_invlist, j);
-                }
-            }
-
-            /* Everything between them is a single range that should be output
-             * */
-            put_range(sv, i, j - 1);
-            has_output_anything = TRUE;
-            i = j;
         }
     }
 
-    return has_output_anything;
+    /* Nothing to output */
+    if (_invlist_len(*invlist_ptr) == 0) {
+        SvREFCNT_dec(invlist);
+        return FALSE;
+    }
+#define MAX_PRINT_A MAX_PRINT_A_FOR_USE_ONLY_BY_REGCOMP_DOT_C
+
+    /* On ASCII platforms the range of printables is contiguous.  If the entire
+     * range is printable, we print each character as such.  If the range is
+     * partially printable and partially not, it's less likely that the
+     * individual printables are meaningful, especially if all or almost all of
+     * them are in the range.  But we err on the side of the individual
+     * printables being meaningful by using the hex only if the range contains
+     * all but 2 of the printables.
+     *
+     * On EBCDIC platforms, the printables are scattered around so that the
+     * maximum range length containing only them is about 10.  Anything longer
+     * we treat as hex; otherwise we examine the range character by character
+     * XXX to see */
+    invlist_iterinit(*invlist_ptr);
+    while (invlist_iternext(*invlist_ptr, &start, &end)) {
+        if (end >= MAX_PRINT_A - 1) {
+            if (end > MAX_PRINT_A) {
+                end = MAX_PRINT_A;
+            }
+            if (start < ' ') {
+                start = ' ';
+            }
+            if (end - start >= MAX_PRINT_A - ' ' - 2) {
+                force_hex = TRUE;
+            }
+            break;
+        }
+    }
+    invlist_iterfinish(*invlist_ptr);
+
+    /* The legibility of the output depends mostly on how many punctuation
+     * characters are output.  There are 32 possible ASCII ones, so if any more
+     * than 16 are to be output, we can instead output it as its complement,
+     * yielding fewer puncts, and making it more legible.  But give some weight
+     * to the fact that outputting it as a complement is less legible than a
+     * straight output, so don't complement unless we are somewhat over the 16
+     * mark */
+    if (! force_hex && punct_count > 20) {
+        // XXX Don't invert if we are not going to be outputting these singly,myperl -Dr -le 'qr/[\007-\x7f]/'
+        sv_catpvs(sv, "^");
+        *invlist_ptr = _add_range_to_invlist(*invlist_ptr,
+                                             NUM_ANYOF_CODE_POINTS, UV_MAX);
+        _invlist_invert(*invlist_ptr);
+    }
+
+    /* Output each range */
+    invlist_iterinit(*invlist_ptr);
+    while (invlist_iternext(*invlist_ptr, &start, &end)) {
+        if (start >= NUM_ANYOF_CODE_POINTS) {
+            break;
+        }
+        put_range(sv, start, end, force_hex);
+    }
+    invlist_iterfinish(*invlist_ptr);
+
+    return TRUE;
 }
 
 #define CLEAR_OPTSTART \
