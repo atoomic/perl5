@@ -263,9 +263,10 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 use 5.008_001;
 use strict;
 use Carp;
-use Symbol;
-use SelectSaver;
-use IO ();	# Load the XS module
+use Symbol      ();
+use SelectSaver ();
+use IO          (); # Load the XS module
+use Exporter    ();  # not a require because we want it to happen before INIT
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -322,14 +323,14 @@ sub new {
 	}
 	croak "usage: $class->new()";
     }
-    my $io = gensym;
+    my $io = Symbol::gensym;
     bless $io, $class;
 }
 
 sub new_from_fd {
     my $class = ref($_[0]) || $_[0] || "IO::Handle";
     @_ == 3 or croak "usage: $class->new_from_fd(FD, MODE)";
-    my $io = gensym;
+    my $io = Symbol::gensym;
     shift;
     IO::Handle::fdopen($io, @_)
 	or return undef;
@@ -366,7 +367,7 @@ sub fdopen {
 
     if (ref($fd) && "$fd" =~ /GLOB\(/o) {
 	# It's a glob reference; Alias it as we cannot get name of anon GLOBs
-	my $n = qualify(*GLOB);
+	my $n = Symbol::qualify(*GLOB);
 	*GLOB = *{*$fd};
 	$fd =  $n;
     } elsif ($fd =~ m#^\d+$#) {
@@ -472,7 +473,7 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = SelectSaver->new(qualify($_[0], caller));
+    my $old = SelectSaver->new(Symbol::qualify($_[0], caller));
     my $prev = $|;
     $| = @_ > 1 ? $_[1] : 1;
     $prev;
@@ -504,7 +505,7 @@ sub input_record_separator {
 
 sub input_line_number {
     local $.;
-    () = tell qualify($_[0], caller) if ref($_[0]);
+    () = tell Symbol::qualify($_[0], caller) if ref($_[0]);
     my $prev = $.;
     $. = $_[1] if @_ > 1;
     $prev;
@@ -512,7 +513,7 @@ sub input_line_number {
 
 sub format_page_number {
     my $old;
-    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
+    $old = SelectSaver->new(Symbol::qualify($_[0], caller)) if ref($_[0]);
     my $prev = $%;
     $% = $_[1] if @_ > 1;
     $prev;
@@ -520,7 +521,7 @@ sub format_page_number {
 
 sub format_lines_per_page {
     my $old;
-    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
+    $old = SelectSaver->new(Symbol::qualify($_[0], caller)) if ref($_[0]);
     my $prev = $=;
     $= = $_[1] if @_ > 1;
     $prev;
@@ -528,7 +529,7 @@ sub format_lines_per_page {
 
 sub format_lines_left {
     my $old;
-    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
+    $old = SelectSaver->new(Symbol::qualify($_[0], caller)) if ref($_[0]);
     my $prev = $-;
     $- = $_[1] if @_ > 1;
     $prev;
@@ -536,17 +537,17 @@ sub format_lines_left {
 
 sub format_name {
     my $old;
-    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
+    $old = SelectSaver->new(Symbol::qualify($_[0], caller)) if ref($_[0]);
     my $prev = $~;
-    $~ = qualify($_[1], caller) if @_ > 1;
+    $~ = Symbol::qualify($_[1], caller) if @_ > 1;
     $prev;
 }
 
 sub format_top_name {
     my $old;
-    $old = SelectSaver->new(qualify($_[0], caller)) if ref($_[0]);
+    $old = SelectSaver->new(Symbol::qualify($_[0], caller)) if ref($_[0]);
     my $prev = $^;
-    $^ = qualify($_[1], caller) if @_ > 1;
+    $^ = Symbol::qualify($_[1], caller) if @_ > 1;
     $prev;
 }
 
@@ -579,7 +580,7 @@ sub format_write {
     @_ < 3 || croak 'usage: $io->write( [FORMAT_NAME] )';
     if (@_ == 2) {
 	my ($io, $fmt) = @_;
-	my $oldfmt = $io->format_name(qualify($fmt,caller));
+	my $oldfmt = $io->format_name(Symbol::qualify($fmt,caller));
 	CORE::write($io);
 	$io->format_name($oldfmt);
     } else {
@@ -618,7 +619,7 @@ sub constant {
 sub printflush {
     my $io = shift;
     my $old;
-    $old = SelectSaver->new(qualify($io, caller)) if ref($io);
+    $old = SelectSaver->new(Symbol::qualify($io, caller)) if ref($io);
     local $| = 1;
     if(ref($io)) {
         print $io @_;
