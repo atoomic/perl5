@@ -1,5 +1,5 @@
 #!perl
-
+my $file = __FILE__;
 BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
@@ -332,7 +332,7 @@ sub make_anon_with_state_sub{
   state $w;
   local $SIG{__WARN__} = sub { $w .= shift };
   eval "#line 56 pygpyf\nsub redef {}";
-  is $w, "Subroutine redef redefined at pygpyf line 56.\n",
+  is $w, "Subroutine redef redefined, called by $file:334 at pygpyf line 56.\n",
          "sub redefinition warnings from state subs";
 }
 {
@@ -669,7 +669,7 @@ sub make_anon_with_my_sub{
   my $w;
   local $SIG{__WARN__} = sub { $w .= shift };
   eval "#line 56 pygpyf\nsub redef {}";
-  is $w, "Subroutine redef redefined at pygpyf line 56.\n",
+  is $w, "Subroutine redef redefined, called by $file:671 at pygpyf line 56.\n",
          "sub redefinition warnings from my subs";
 
   undef $w;
