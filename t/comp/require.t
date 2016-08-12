@@ -2,8 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = '.';
-    push @INC, '../lib', '../ext/re';
+    unshift @INC, '.', '../lib', '../ext/re';
 }
 
 sub do_require {
