@@ -4482,10 +4482,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dsv, SV* ssv, const I32 flags)
 #ifdef PERL_COPY_ON_WRITE
                  (sflags & SVf_IsCOW
                    ? (!len ||
-                       (  (CHECK_COWBUF_THRESHOLD(cur,len) || SvLEN(dsv) < cur+1)
-                          /* If this is a regular (non-hek) COW, only so
-                             many COW "copies" are possible. */
-                       && CowREFCNT(ssv) != SV_COW_REFCNT_MAX  ))
+                       (  (CHECK_COWBUF_THRESHOLD(cur,len) || SvLEN(dsv) < cur+1) )
+                     )
                    : (  (sflags & CAN_COW_MASK) == CAN_COW_FLAGS
                      && !(SvFLAGS(dsv) & SVf_BREAK)
                      && CHECK_COW_THRESHOLD(cur,len) && cur+1 < len
@@ -4520,7 +4518,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dsv, SV* ssv, const I32 flags)
                     if (sflags & SVf_IsCOW) {
                         sv_buf_to_rw(ssv);
                     }
-                    CowREFCNT(ssv)++;
+                    if(CowREFCNT(ssv) != COW_STATIC ) CowREFCNT(ssv)++;
                     SvPV_set(dsv, SvPVX_mutable(ssv));
                     sv_buf_to_ro(ssv);
             } else
@@ -4712,7 +4710,6 @@ Perl_sv_setsv_cow(pTHX_ SV *dsv, SV *ssv)
             goto common_exit;
         }
         assert(SvCUR(ssv)+1 < SvLEN(ssv));
-        assert(CowREFCNT(ssv) < SV_COW_REFCNT_MAX);
     } else {
         assert ((SvFLAGS(ssv) & CAN_COW_MASK) == CAN_COW_FLAGS);
         SvUPGRADE(ssv, SVt_COW);
@@ -4724,7 +4721,7 @@ Perl_sv_setsv_cow(pTHX_ SV *dsv, SV *ssv)
 #  ifdef PERL_DEBUG_READONLY_COW
     if (already) sv_buf_to_rw(ssv);
 #  endif
-    CowREFCNT(ssv)++;
+    if(CowREFCNT(ssv) != COW_STATIC ) CowREFCNT(ssv)++;
     new_pv = SvPVX_mutable(ssv);
     sv_buf_to_ro(ssv);
 
@@ -5073,8 +5070,10 @@ S_sv_uncow(pTHX_ SV * const sv, const U32 flags)
             {
                 U8 cowrefcnt = CowREFCNT(sv);
                 if(cowrefcnt != 0) {
-                    cowrefcnt--;
-                    CowREFCNT(sv) = cowrefcnt;
+                    if(cowrefcnt != COW_STATIC ) {
+                        cowrefcnt--;
+                        CowREFCNT(sv) = cowrefcnt;
+                    }
                     sv_buf_to_ro(sv);
                     goto copy_over;
                 }
@@ -6699,8 +6698,8 @@ Perl_sv_clear(pTHX_ SV *const orig_sv)
                 }
             }
 #ifdef PERL_ANY_COW
-            else if (SvPVX_const(sv)
-                     && !(SvTYPE(sv) == SVt_PVIO
+            else if (SvPVX_const(sv) /* PV is valid */
+                    && !(SvTYPE(sv) == SVt_PVIO /* Not an IO pointer */
                      && !(IoFLAGS(sv) & IOf_FAKE_DIRP)))
             {
                 if (SvIsCOW(sv)) {
@@ -6718,9 +6717,11 @@ Perl_sv_clear(pTHX_ SV *const orig_sv)
                     }
                     else {
                         if (CowREFCNT(sv)) {
-                            sv_buf_to_rw(sv);
-                            CowREFCNT(sv)--;
-                            sv_buf_to_ro(sv);
+                            if(CowREFCNT(sv) != COW_STATIC ) {
+                                sv_buf_to_rw(sv);
+                                CowREFCNT(sv)--;
+                                sv_buf_to_ro(sv);
+                            }
                             SvLEN_set(sv, 0);
                         }
                     }
