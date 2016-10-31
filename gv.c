@@ -1551,6 +1551,7 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                STRLEN *len, const char *nambeg, STRLEN full_len,
                const U32 is_utf8, const I32 add)
 {
+    char *tmpbuf = NULL;
     const char *name_cursor;
     const char *const name_end = nambeg + full_len;
     const char *const name_em1 = name_end - 1;
@@ -1581,19 +1582,19 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                     *len += 2;
                 }
                 else {
-                    char *tmpbuf;
-                    Newx(tmpbuf, *len+2, char);
+                    if (tmpbuf == NULL) /* only malloc&free once, a little more than needed */
+                        Newx(tmpbuf, full_len+2, char);
                     /* Newx(tmpbuf, *full_len+2, char); */
                     Copy(*name, tmpbuf, *len, char);
                     tmpbuf[(*len)++] = ':';
                     tmpbuf[(*len)++] = ':';
+                    /*tmpbuf[(*len) + 1] = '\0';*/
                     key = tmpbuf;
                 }
                 gvp = (GV**)hv_fetch(*stash, key, is_utf8 ? -((I32)*len) : (I32)*len, add);
                 *gv = gvp ? *gvp : NULL;
                 if (!*gv || *gv == (const GV *)&PL_sv_undef) { 
-                    if (key != *name)
-                        Safefree(key);
+                    Safefree(tmpbuf);
                     return FALSE;
                 }
                 /* here we know that *gv && *gv != &PL_sv_undef */
@@ -1601,8 +1602,6 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                     gv_init_pvn(*gv, *stash, key, *len, (add & GV_ADDMULTI)|is_utf8);
                 else
                     GvMULTI_on(*gv);
-                if (key != *name)
-                    Safefree(key);
 
                 if (!(*stash = GvHV(*gv))) {
                     *stash = GvHV(*gv) = newHV();
@@ -1630,11 +1629,14 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
             if (*name == name_end) {
                 if (!*gv)
                     *gv = MUTABLE_GV(*hv_fetchs(PL_defstash, "main::", TRUE));
+                Safefree(tmpbuf);
                 return TRUE;
             }
         }
     }
     *len = name_cursor - *name;
+    Safefree(tmpbuf); /* probably not required */
+    /*ASSERT(!tmpbuf, ("tmpbuff should not be defined here"));*/
     return TRUE;
 }
 
