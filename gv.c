@@ -1583,6 +1583,7 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                 else {
                     char *tmpbuf;
                     Newx(tmpbuf, *len+2, char);
+                    /* Newx(tmpbuf, *full_len+2, char); */
                     Copy(*name, tmpbuf, *len, char);
                     tmpbuf[(*len)++] = ':';
                     tmpbuf[(*len)++] = ':';
@@ -1590,16 +1591,18 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                 }
                 gvp = (GV**)hv_fetch(*stash, key, is_utf8 ? -((I32)*len) : (I32)*len, add);
                 *gv = gvp ? *gvp : NULL;
-                if (*gv && *gv != (const GV *)&PL_sv_undef) {
-                    if (SvTYPE(*gv) != SVt_PVGV)
-                        gv_init_pvn(*gv, *stash, key, *len, (add & GV_ADDMULTI)|is_utf8);
-                    else
-                        GvMULTI_on(*gv);
+                if (!*gv || *gv == (const GV *)&PL_sv_undef) { 
+                    if (key != *name)
+                        Safefree(key);
+                    return FALSE;
                 }
+                /* here we know that *gv && *gv != &PL_sv_undef */
+                if (SvTYPE(*gv) != SVt_PVGV)
+                    gv_init_pvn(*gv, *stash, key, *len, (add & GV_ADDMULTI)|is_utf8);
+                else
+                    GvMULTI_on(*gv);
                 if (key != *name)
                     Safefree(key);
-                if (!*gv || *gv == (const GV *)&PL_sv_undef)
-                    return FALSE;
 
                 if (!(*stash = GvHV(*gv))) {
                     *stash = GvHV(*gv) = newHV();
