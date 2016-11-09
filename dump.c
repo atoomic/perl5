@@ -2435,10 +2435,18 @@ For an example of its output, see L<Devel::Peek>.
 void
 Perl_sv_dump(pTHX_ SV *sv)
 {
+    PERL_ARGS_ASSERT_SV_DUMP;
+    if (PL_in_sv_dump)
+        return;
+    else
+        PL_in_sv_dump = 1;
+
     if (sv && SvROK(sv))
 	do_sv_dump(0, Perl_debug_log, sv, 0, 4, 0, 0);
     else
 	do_sv_dump(0, Perl_debug_log, sv, 0, 0, 0, 0);
+
+    PL_in_sv_dump = 0;
 }
 
 int
