@@ -2259,13 +2259,16 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     if ((flags & GV_NOTQUAL) || !full_len) {
         len = full_len;
     }
+    /* get stash & populate stash a::b::c::d */
     else if (parse_gv_stash_name(&stash, &gv, &name, &len, nambeg, full_len, is_utf8, add)) {
         if (name == name_end) return gv;
     }
     else {
         return NULL;
     }
-
+    /* fallback logic to get the stash 'PL_defstash' or 'Pl_curstash' 
+        and might call ourself recursively for <none>:: 
+    */
     if (!stash && !find_default_stash(&stash, name, len, is_utf8, add, sv_type)) {
         return NULL;
     }
@@ -2300,6 +2303,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
                exist, then (say) referencing $! first, and %! second would
                mean that %! was not handled correctly.  */
 	    if (len == 1 && stash == PL_defstash) {
+            /* load Errno for $!, Tie::Hash::NamedCapture for $- or $+, arybase for $[ */
                 maybe_multimagic_gv(gv, name, sv_type);
 	    }
 	    else if (len == 3 && sv_type == SVt_PVAV
