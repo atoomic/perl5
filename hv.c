@@ -34,7 +34,8 @@ holds the key and hash value.
 #define PERL_HASH_INTERNAL_ACCESS
 #include "perl.h"
 
-#define DO_HSPLIT(xhv) ((xhv)->xhv_keys > (xhv)->xhv_max) /* HvTOTALKEYS(hv) > HvMAX(hv) */
+#define SHOULD_HSPLIT(xhv) ((xhv)->xhv_keys > (2*(xhv)->xhv_max)) /* HvTOTALKEYS(hv) > 2 * HvMAX(hv) previously known as HSPLIT */
+#define HSPLIT(xhv, oldsize) hsplit(xhv, oldsize, oldsize * 4) /* 2 * the split limit above (=2*HvMAX) */
 #define HV_FILL_THRESHOLD 31
 
 static const char S_strtab_error[]
@@ -877,7 +878,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	HvHASKFLAGS_on(hv);
 
     xhv->xhv_keys++; /* HvTOTALKEYS(hv)++ */
-    if ( DO_HSPLIT(xhv) ) {
+    if ( SHOULD_HSPLIT(xhv) ) {
         const STRLEN oldsize = xhv->xhv_max + 1;
         const U32 items = (U32)HvPLACEHOLDERS_get(hv);
 
@@ -894,10 +895,10 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
                If we're lucky, then we may clear sufficient placeholders to
                avoid needing to split the hash at all.  */
             clear_placeholders(hv, items);
-            if (DO_HSPLIT(xhv))
-                hsplit(hv, oldsize, oldsize * 2);
+            if (SHOULD_HSPLIT(xhv))
+                HSPLIT(hv, oldsize);
         } else
-            hsplit(hv, oldsize, oldsize * 2);
+            HSPLIT(hv, oldsize);
     }
 
     if (return_svp) {
@@ -3047,9 +3048,9 @@ S_share_hek_flags(pTHX_ const char *str, I32 len, U32 hash, int flags)
 
 	xhv->xhv_keys++; /* HvTOTALKEYS(hv)++ */
 	if (!next) {			/* initial entry? */
-	} else if ( DO_HSPLIT(xhv) ) {
+	} else if ( SHOULD_HSPLIT(xhv) ) {
             const STRLEN oldsize = xhv->xhv_max + 1;
-            hsplit(PL_strtab, oldsize, oldsize * 2);
+            HSPLIT(PL_strtab, oldsize);
 	}
     }
 

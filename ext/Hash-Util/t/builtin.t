@@ -6,7 +6,7 @@ use Test::More;
 my @Exported_Funcs;
 BEGIN {
     @Exported_Funcs = qw( bucket_ratio num_buckets used_buckets );
-    plan tests => 13 + @Exported_Funcs;
+    plan tests => 19 + @Exported_Funcs;
     use_ok 'Hash::Util', @Exported_Funcs;
 }
 foreach my $func (@Exported_Funcs) {
@@ -31,8 +31,17 @@ is(num_buckets(%hash), 8, "hash should have eight buckets");
 cmp_ok(used_buckets(%hash), "<", 8, "hash should have one used buckets");
 
 $hash{8}= 8;
-like(bucket_ratio(%hash), qr!/16!, "hash has expected number of buckets in bucket_ratio");
-is(num_buckets(%hash), 16, "hash should have sixteen buckets");
+like(bucket_ratio(%hash), qr!/8!, "hash has expected number of buckets in bucket_ratio");
+is(num_buckets(%hash), 8, "hash should have eight buckets");
 cmp_ok(used_buckets(%hash), "<=", 8, "hash should have at most 8 used buckets");
 
+$hash{$_}= $_ for 9..14;
+like(bucket_ratio(%hash), qr!/8!, "hash has expected number of buckets in bucket_ratio");
+is(num_buckets(%hash), 8, "hash should have eight buckets");
+cmp_ok(used_buckets(%hash), "<=", 8, "hash should have at most 8 used buckets");
+
+$hash{15}= 15;
+like(bucket_ratio(%hash), qr!/32!, "hash has expected number of buckets in bucket_ratio");
+is(num_buckets(%hash), 32, "hash should have 32 buckets");
+cmp_ok(used_buckets(%hash), "<=",16, "hash should have at most 8 used buckets");
 
