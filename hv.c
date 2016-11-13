@@ -34,8 +34,8 @@ holds the key and hash value.
 #define PERL_HASH_INTERNAL_ACCESS
 #include "perl.h"
 
-#define SHOULD_HSPLIT(xhv) ((xhv)->xhv_keys > (2*(xhv)->xhv_max)) /* HvTOTALKEYS(hv) > 2 * HvMAX(hv) previously known as HSPLIT */
-#define HSPLIT(xhv, oldsize) hsplit(xhv, oldsize, oldsize * 4) /* 2 * the split limit above (=2*HvMAX) */
+#define SHOULD_HSPLIT(xhv) ((xhv)->xhv_keys > (64*(xhv)->xhv_max)) /* HvTOTALKEYS(hv) > 2 * HvMAX(hv) previously known as HSPLIT */
+#define HSPLIT(xhv, oldsize) hsplit(xhv, oldsize, oldsize * 2) /* 2 * the split limit above (=2*HvMAX) */
 #define HV_FILL_THRESHOLD 31
 
 static const char S_strtab_error[]
