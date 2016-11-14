@@ -33,7 +33,6 @@ use Socket 1.97 qw(
 );
 my $AF_INET6 = eval { Socket::AF_INET6() }; # may not be defined
 my $AI_ADDRCONFIG = eval { Socket::AI_ADDRCONFIG() } || 0;
-use POSIX qw( dup2 );
 use Errno qw( EINVAL EINPROGRESS EISCONN ENOTCONN ETIMEDOUT EWOULDBLOCK EOPNOTSUPP );
 
 use constant HAVE_MSWIN32 => ( $^O eq "MSWin32" );
@@ -979,7 +978,10 @@ sub socket :method
    # I hate core prototypes sometimes...
    socket( my $tmph, $_[0], $_[1], $_[2] ) or return undef;
 
-   dup2( $tmph->fileno, $self->fileno ) or die "Unable to dup2 $tmph onto $self - $!";
+   if ($tmph->fileno != $self->fileno) {
+     require Cpanel::POSIX::Tiny;
+     Cpanel::POSIX::Tiny::dup2( $tmph->fileno, $self->fileno ) or die "Unable to dup2 $tmph onto $self - $!";
+   }
 }
 
 # Versions of IO::Socket before 1.35 may leave socktype undef if from, say, an
