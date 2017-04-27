@@ -1596,6 +1596,7 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
     const char *name_cursor;
     const char *const name_end = nambeg + full_len;
     const char *const name_em1 = name_end - 1;
+    char smallbuf[64]; /* small buffer to avoid a malloc when possible */
 
     PERL_ARGS_ASSERT_PARSE_GV_STASH_NAME;
     
@@ -1627,7 +1628,11 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                 }
                 else {
                     char *tmpbuf;
-                    Newx(tmpbuf, *len+2, char);
+                    /* use our pre-allocated buffer when possible to save a malloc */
+                    if ( *len+2 <= sizeof smallbuf)
+                        tmpbuf = smallbuf;
+                    else
+                        Newx(tmpbuf, *len+2, char);
                     Copy(*name, tmpbuf, *len, char);
                     tmpbuf[(*len)++] = ':';
                     tmpbuf[(*len)++] = ':';
@@ -1641,7 +1646,7 @@ S_parse_gv_stash_name(pTHX_ HV **stash, GV **gv, const char **name,
                     else
                         GvMULTI_on(*gv);
                 }
-                if (key != *name)
+                if (key != *name && key != smallbuf)
                     Safefree(key);
                 if (!*gv || *gv == (const GV *)&PL_sv_undef)
                     return FALSE;
