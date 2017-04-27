@@ -2682,7 +2682,7 @@ typedef struct padname PADNAME;
 #  define PERL_COPY_ON_WRITE
 #endif
 
-#ifdef PERL_COPY_ON_WRITE
+#if defined(PERL_COPY_ON_WRITE) || defined(PERL_COPY_ON_WRITE3)
 #  define PERL_ANY_COW
 #else
 # define PERL_SAWAMPERSAND

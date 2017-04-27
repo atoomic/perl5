@@ -227,6 +227,7 @@ Perl_sv_does_sv(pTHX_ SV *sv, SV *namesv, U32 flags)
     methodname = newSV_type(SVt_PV);
     SvLEN_set(methodname, 0);
     SvCUR(methodname) = strlen(PL_isa_DOES);
+    assert(!SvSHORTPV(methodname));
     SvPVX(methodname) = (char *)PL_isa_DOES; /* discard 'const' qualifier */
     SvPOK_on(methodname);
     sv_2mortal(methodname);

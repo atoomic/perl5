@@ -1693,6 +1693,8 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	if (SvWEAKREF(sv))	sv_catpv(d, "WEAKREF,");
     }
     if (flags & SVf_IsCOW && type != SVt_PVHV) sv_catpvs(d, "IsCOW,");
+    if (SvSHORTPV_TRUELY(sv))
+        sv_catpvs(d, "SHORTPV,");
     append_flags(d, flags, second_sv_flags_names);
     if (flags & SVp_SCREAM && type != SVt_PVHV && !isGV_with_GP(sv)
 			   && type != SVt_PVAV) {
@@ -1855,8 +1857,11 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		Perl_dump_indent(aTHX_ level, file, "  REGEXP = 0x%" UVxf "\n",
                    PTR2UV(((XPV*)SvANY(sv))->xpv_len_u.xpvlenu_rx));
             else
+        {
+        if (!re && !SvSHORTPV_TRUELY(sv))
 		Perl_dump_indent(aTHX_ level, file, "  LEN = %" IVdf "\n",
 				       (IV)SvLEN(sv));
+        }
 #ifdef PERL_COPY_ON_WRITE
             if (SvIsCOW(sv) && SvLEN(sv)) {
                 Perl_dump_indent(aTHX_ level, file, "  COW_META = 0x%"UVxf"\n",
