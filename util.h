@@ -201,6 +201,8 @@ means arg not present, 1 is empty string/null byte */
 #define HS_GETXSVERLEN(key) ((U8) ((key) >> 8))
 #define HS_GETAPIVERLEN(key) ((key) & HSm_APIVERLEN)
 
+STATIC_MEMORY_AREA *_check_static_memory_address(Malloc_t where);
+
 /* internal to util.h macro to create a packed handshake key, all args must be constants */
 /* U32 return = (U16 interpsize, bool cxt, bool setxsubfn, bool popmark,
    U5 (FIVE!) apiverlen, U8 xsverlen) */

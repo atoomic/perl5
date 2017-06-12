@@ -28,6 +28,7 @@
 
 /* Hide global symbols */
 
+#define DeclareStaticMemory    Perl_DeclareStaticMemory
 #define Gv_AMupdate(a,b)	Perl_Gv_AMupdate(aTHX_ a,b)
 #define SvAMAGIC_off		Perl_SvAMAGIC_off
 #define SvAMAGIC_on		Perl_SvAMAGIC_on

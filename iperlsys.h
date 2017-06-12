@@ -859,7 +859,7 @@ struct IPerlMemInfo
 #define PerlMemShared_realloc(buf, size)		    \
         (*PL_MemShared->pRealloc)(PL_MemShared, (buf), (size))
 #define PerlMemShared_free(buf)				    \
-        (*PL_MemShared->pFree)(PL_MemShared, (buf))
+        (_check_static_memory_address((buf)) ? 0 : (*PL_MemShared->pFree)(PL_MemShared, (buf)))
 #define PerlMemShared_calloc(num, size)			    \
         (*PL_MemShared->pCalloc)(PL_MemShared, (num), (size))
 #define PerlMemShared_get_lock()			    \
@@ -900,7 +900,7 @@ struct IPerlMemInfo
 /* Shared memory macros */
 #define PerlMemShared_malloc(size)		malloc((size))
 #define PerlMemShared_realloc(buf, size)	realloc((buf), (size))
-#define PerlMemShared_free(buf)			free((buf))
+#define PerlMemShared_free(buf)                        (_check_static_memory_address((buf)) ? 0 : free((buf)))
 #define PerlMemShared_calloc(num, size)		calloc((num), (size))
 #define PerlMemShared_get_lock()		
 #define PerlMemShared_free_lock()

@@ -1040,6 +1040,11 @@ PERLVARA(I, mem_log, 1 + 1 + TYPE_DIGITS(UV) + 1 + 3 + 1, char)
  * have to worry about SV refcounts during scope enter/exit. */
 PERLVAR(I, prevailing_version, U16)
 
+/* statics variables for StaticMemory management */
+PERLVARI(I, static_memory_from,        Malloc_t,       0)      /* first memory address where we have declared a usage of static memory */
+PERLVARI(I, static_memory_to,  Malloc_t,       0)      /* last memory address where we have declared a usage of static memory */
+PERLVARI(I, static_memory_buffer, STATIC_MEMORY_AREA *, NULL)   /* buffer storage (linked list for now) */
+
 /* If you are adding a U8 or U16, check to see if there are 'Space' comments
  * above on where there are gaps which currently will be structure padding.  */
 
