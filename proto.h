@@ -35,6 +35,7 @@ PERL_STATIC_INLINE GV *	Perl_CvGV(pTHX_ CV *sv);
 #define PERL_ARGS_ASSERT_CVGV	\
 	assert(sv)
 #endif
+PERL_CALLCONV void  Perl_DeclareStaticMemory(Malloc_t from, Malloc_t to, MEM_SIZE size);
 PERL_CALLCONV int	Perl_Gv_AMupdate(pTHX_ HV* stash, bool destructing);
 #define PERL_ARGS_ASSERT_GV_AMUPDATE	\
 	assert(stash)
