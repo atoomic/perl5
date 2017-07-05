@@ -35,6 +35,7 @@ PERL_STATIC_INLINE GV *	Perl_CvGV(pTHX_ CV *sv);
 #define PERL_ARGS_ASSERT_CVGV	\
 	assert(sv)
 #endif
+PERL_CALLCONV void  Perl_DeclareSharedMemoryUsage(Malloc_t where, MEM_SIZE size);
 PERL_CALLCONV void  Perl_DeclareStaticMemory(Malloc_t from, Malloc_t to, MEM_SIZE size);
 PERL_CALLCONV int	Perl_Gv_AMupdate(pTHX_ HV* stash, bool destructing);
 #define PERL_ARGS_ASSERT_GV_AMUPDATE	\
@@ -298,6 +299,10 @@ PERL_CALLCONV void	Perl_av_undef(pTHX_ AV *av);
 PERL_CALLCONV void	Perl_av_unshift(pTHX_ AV *av, SSize_t num);
 #define PERL_ARGS_ASSERT_AV_UNSHIFT	\
 	assert(av)
+PERL_CALLCONV Malloc_t	Perl_bc_safesysrealloc(Malloc_t where, MEM_SIZE nbytes)
+			__attribute__malloc__
+			__attribute__warn_unused_result__;
+
 PERL_CALLCONV OP*	Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 			__attribute__warn_unused_result__;
 #define PERL_ARGS_ASSERT_BIND_MATCH	\
