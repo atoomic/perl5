@@ -12489,9 +12489,11 @@ Perl_sv_vcatpvfn_flags(pTHX_ SV *const sv, const char *const pat, const STRLEN p
                         has_precis = TRUE;
                     }
                     argsv = MUTABLE_SV(va_arg(*args, void*));
-                    eptr = SvPV_const(argsv, elen);
+                    if (argsv) {
+                        eptr = SvPV_const(argsv, elen);
                     if (DO_UTF8(argsv))
                         is_utf8 = TRUE;
+                    }
                     width = 0;
                     goto string;
                 }
