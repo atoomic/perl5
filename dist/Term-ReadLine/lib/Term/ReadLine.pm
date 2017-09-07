@@ -229,12 +229,17 @@ sub readline {
 }
 sub addhistory {}
 
+# used for testing purpose
+sub devtty { return '/dev/tty' }
+
 sub findConsole {
     my $console;
     my $consoleOUT;
 
-    if ($^O ne 'MSWin32' and -e "/dev/tty") {
-	$console = "/dev/tty";
+    my $devtty = devtty();
+
+    if ($^O ne 'MSWin32' and -e $devtty) {
+	$console = $devtty;
     } elsif ($^O eq 'MSWin32' or $^O eq 'msys' or -e "con") {
        $console = 'CONIN$';
        $consoleOUT = 'CONOUT$';
@@ -248,7 +253,7 @@ sub findConsole {
 
     $consoleOUT = $console unless defined $consoleOUT;
     $console = "&STDIN" unless defined $console;
-    if ($console eq "/dev/tty" && !open(my $fh, "<", $console)) {
+    if ($console eq $devtty && !open(my $fh, "<", $console)) {
       $console = "&STDIN";
       undef($consoleOUT);
     }
@@ -265,9 +270,6 @@ sub new {
   my ($FIN, $FOUT, $ret);
   if (@_==2) {
     my($console, $consoleOUT) = $_[0]->findConsole;
-
-
-
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
     # a SetConsoleMode() if we end up using Term::ReadKey
