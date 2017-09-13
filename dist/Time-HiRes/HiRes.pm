@@ -4,9 +4,9 @@ package Time::HiRes;
 use strict;
 
 require Exporter;
-require DynaLoader;
+use XSLoader ();
 
-our @ISA = qw(Exporter DynaLoader);
+our @ISA = qw(Exporter);
 
 our @EXPORT = qw( );
 our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
@@ -28,7 +28,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 stat lstat utime
 		);
 
-our $VERSION = '1.9743';
+our $VERSION = '1.9744';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -69,7 +69,7 @@ sub import {
     Time::HiRes->export_to_level(1, $this, @_);
 }
 
-bootstrap Time::HiRes;
+XSLoader::load( 'Time::HiRes', $XS_VERSION );
 
 # Preloaded methods go here.
 
