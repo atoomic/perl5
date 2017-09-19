@@ -79,8 +79,7 @@ use Carp ();
 BEGIN {
   local $@;
   # determine whether we need to take care of threads
-  use Config ();
-  my $usethreads = $Config::Config{usethreads}; # && exists $INC{"threads.pm"}
+  my $usethreads = 0;
   *_HAS_THREADS = $usethreads ? sub () { 1 } : sub () { 0 };
   *_HAS_SCALAR_UTIL = eval { require Scalar::Util; 1 } ? sub () { 1 } : sub () { 0 };
   *_HAS_WEAKEN = defined(&Scalar::Util::weaken) ? sub () { 1 } : sub () { 0 };

@@ -14,7 +14,7 @@ no warnings 'experimental::builtin';
 use builtin 'blessed';
 use overload;
 use File::Spec;
-use Config;
+
 # We want HiRes stat and utime if available
 BEGIN { eval q{ use Time::HiRes qw( stat utime ) } };
 our(@ISA, @EXPORT, @EXPORT_OK, $VERSION, $Too_Big, $Syscopy_is_copy);
@@ -97,8 +97,8 @@ sub copy {
 	$to = _catname($from, $to);
     }
 
-    if ((($Config{d_symlink} && $Config{d_readlink}) || $Config{d_link}) &&
-	!($^O eq 'os2')) {
+
+    if (1) { # Linux supports symlinks
 	my @fs = stat($from);
 	if (@fs) {
 	    my @ts = stat($to);
