@@ -3000,6 +3000,9 @@ PP(pp_multideref)
                         }
                         else {
                             if (localizing) {
+                                if ( SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV && CvNAMED(SvRV(sv)) ) {
+                                    sv = (SV*) CvGV( SvRV(sv) );
+                                }
                                 if (HvNAME_get(hv) && isGV(sv))
                                     save_gp(MUTABLE_GV(sv),
                                         !(PL_op->op_flags & OPf_SPECIAL));
