@@ -3761,6 +3761,14 @@ S_require_file(pTHX_ SV *sv)
     if (!(name && len > 0 && *name))
         DIE(aTHX_ "Missing or undefined argument to %s", op_name);
 
+/* FIXME should be only ifndef VMS */
+	/* try to return earlier if INC already got the name */
+	if (op_is_require) {
+		/* can optimize to only perform one single lookup */
+		SV * const * const svp = hv_fetch(GvHVn(PL_incgv), (char*) name, len, 0);
+		if ( svp && *svp != &PL_sv_undef ) RETPUSHYES;
+	}
+
     if (!IS_SAFE_PATHNAME(name, len, op_name)) {
         if (!op_is_require) {
             CLEAR_ERRSV();
@@ -3799,8 +3807,7 @@ S_require_file(pTHX_ SV *sv)
 	unixlen = len;
     }
     if (op_is_require) {
-	SV * const * const svp = hv_fetch(GvHVn(PL_incgv),
-					  unixname, unixlen, 0);
+	SV * const * const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
 	if ( svp ) {
 	    if (*svp != &PL_sv_undef)
 		RETPUSHYES;
