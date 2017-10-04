@@ -77,7 +77,6 @@ sub setup_embed {
 	else {
 	    @args = split /\s*\|\s*/, $_;
 	}
-
 	if (@args == 1) {
             if ($args[0] !~ /^#\s*(?:if|ifdef|ifndef|else|endif)/) {
                 die "Illegal line $. '$args[0]' in embed.fnc";
@@ -132,11 +131,11 @@ sub setup_embed {
     my $current = current_group();
 
     foreach (@embed) {
-    if (@$_ > 1) {
+	if (@$_ > 1) {
 	    push @$current, $_;
 	    next;
 	}
-	$_->[0] =~ s/^#\s+(.+)/#$1/;
+	$_->[0] =~ s/^#\s+/#/;
 	$_->[0] =~ /^\S*/;
 	$_->[0] =~ s/^#ifdef\s+(\S+)/#if defined($1)/;
 	$_->[0] =~ s/^#ifndef\s+(\S+)/#if !defined($1)/;
