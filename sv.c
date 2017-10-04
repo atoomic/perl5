@@ -4752,7 +4752,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, SV* sstr, const I32 flags)
                          many COW "copies" are possible. */
                        ( CowREFCNT(sstr) != SV_COW_REFCNT_MAX )
                      )
-		   : (  (sflags & CAN_COW_MASK) == CAN_COW_FLAGS
+		   : (  SvCANCOW(sstr)
 		     && !(SvFLAGS(dstr) & SVf_BREAK)
                      && CHECK_COW_THRESHOLD(cur,len)
 		    ))
@@ -4976,11 +4976,11 @@ SV *
 Perl_sv_cow_meta_setup(pTHX_ SV *sstr)
 {
     PERL_ARGS_ASSERT_SV_COW_META_SETUP;
-    assert ((SvFLAGS(sstr) & CAN_COW_MASK) == CAN_COW_FLAGS);
+    assert (SvCANCOW(sstr));
     {
         COW_META *cm= new_COW_META();
         assert (!SvIsCOW(sstr));
-        assert ((SvFLAGS(sstr) & CAN_COW_MASK) == CAN_COW_FLAGS);
+        assert (SvCANCOW(sstr));
         SvUPGRADE(sstr, SVt_COW);
         cm->cm_len= SvLEN_raw(sstr);
         cm->cm_refcnt= 0;

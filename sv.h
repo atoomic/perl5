@@ -2014,7 +2014,8 @@ Like C<sv_utf8_upgrade>, but doesn't do magic on C<sv>.
 #   define SvCOW_REFCNT(sv)        (SvCOW_META(sv)->cm_refcnt)
 #   define SvCOW_FLAGS(sv)        (SvCOW_META(sv)->cm_flags)
 #   define SV_COW_REFCNT_MAX        (UV_MAX >> COW_META_FLAG_BITS)
-#   define CAN_COW_MASK	(SVf_POK|SVf_ROK|SVp_POK|SVf_FAKE| \
+    /* cannot cow a SHORTPV */
+#   define CAN_COW_MASK	(SVf_POK|SVf_ROK|SVp_POK|SVf_FAKE|SVf_SHORTPV| \
 			 SVf_OOK|SVf_BREAK|SVf_READONLY|SVf_PROTECT)
 #endif
 
