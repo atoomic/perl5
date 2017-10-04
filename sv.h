@@ -1420,8 +1420,12 @@ object type. Exposed to perl code via Internals::SvREADONLY().
                 assert(!isGV_with_GP(sv));                              \
                 assert(!(SvTYPE(sv) == SVt_PVIO                         \
                      && !(IoFLAGS(sv) & IOf_FAKE_DIRP)));               \
-                ((XPV*)SvANY(sv))->xpv_len = (val);                     \ 
+                ((XPV*)SvANY(sv))->xpv_len = (val);                     \
         } STMT_END
+
+#define SvEND_set(sv, val) \
+        STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
+                SvCUR_set(sv, (val) - SvPVX(sv)); } STMT_END
 
 #define SvPV_renew(sv,n) \
         STMT_START { \
