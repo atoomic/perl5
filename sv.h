@@ -496,10 +496,10 @@ typedef struct cow_meta_arena COW_META_ARENA;
 /* the len+other part of an XPV */
 struct xpv_nonbuf {
     union {
-        struct regexp* xpvlenu_rx; /* regex when SV body is XPVLV */ /* view/use xpv_rx macro */
+        struct regexp* xpvlenu_rx; /* regex when SV body is XPVLV - view/use xpv_rx macro */
         STRLEN	xpvlenu_len; /* allocated size */
         char *	xpvlenu_pv;  /* regexp string */
-        COW_META * xpvlenu_cow_meta; /* ref to refcount struct */ /* NICO FIXME - adjust macro */
+        COW_META * xpvlenu_cow_meta; /* ref to refcount struct - view/use xpv_cow_meta macro */
     } xpv_len_u;
 #ifdef PERL_COPY_ON_WRITE3
     void* xpv_bufu_unused;   /* XXX reserved for future use */ /* NICO FIXME --- to merge with COW_META ?? */
@@ -518,7 +518,7 @@ struct xpv_nonbuf {
 
 #define xpv_len	xpv_bufu.xpv_bufu_nonbuf.xpv_len_u.xpvlenu_len
 #define xpv_rx xpv_bufu.xpv_bufu_nonbuf.xpv_len_u.xpvlenu_rx
-
+#define xpv_cow_meta xpv_bufu.xpv_bufu_nonbuf.xpv_len_u.xpvlenu_cow_meta
 
 #define SvSHORTPV_BUFSIZE      (sizeof(struct xpv_nonbuf))
 #define SvSHORTPV_BODY_FROM_PV(pv) \
@@ -1229,7 +1229,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  define SvPVX(sv) SvPVX_mutable(sv)
 #  endif
 #  define SvCUR(sv) (0 + ((XPV*) SvANY(sv))->xpv_cur)
-#  define SvCOW_META(sv) (0 + ((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_cow_meta)
+#  define SvCOW_META(sv) (0 + ((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
 #  define SvLEN_raw(sv) (0 + ((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_len)
 #  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
@@ -1238,7 +1238,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  define SvMAGIC(sv)	(0 + *(assert_(SvTYPE(sv) >= SVt_PVMG) &((XPVMG*)  SvANY(sv))->xmg_u.xmg_magic))
 #  define SvSTASH(sv)	(0 + *(assert_(SvTYPE(sv) >= SVt_PVMG) &((XPVMG*)  SvANY(sv))->xmg_stash))
 #else /* ! PERL_DEBUG_COW */
-#  define SvCOW_META(sv) (((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_cow_meta)
+#  define SvCOW_META(sv) (((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
 #  define SvLEN_raw(sv) (((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_len)
 #  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
@@ -1402,7 +1402,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
                 assert(!isGV_with_GP(sv));                                   \
                 assert(!(SvTYPE(sv) == SVt_PVIO                                   \
                      && !(IoFLAGS(sv) & IOf_FAKE_DIRP)));                  \
-                (((XPV*)  SvANY(sv))->xpv_len_u.xpvlenu_cow_meta = (val)); \
+                (((XPV*)  SvANY(sv))->xpv_cow_meta = (val)); \
         } STMT_END
 
 #define SvLEN_set(sv, val)                                              \
