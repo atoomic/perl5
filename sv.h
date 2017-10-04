@@ -497,7 +497,6 @@ typedef struct cow_meta_arena COW_META_ARENA;
     union _xmgu	xmg_u;							\
     STRLEN	xpv_cur;	/* length of svu_pv as a C string */    \
     union {								\
-	STRLEN	xpvlenu_len; 	/* allocated size */			\
         struct regexp* xpvlenu_rx; /* regex when SV body is XPVLV */    \
         STRLEN       xpvlenu_len;        /* allocated size */           \
         char *       xpvlenu_pv;         /* regexp string */            \

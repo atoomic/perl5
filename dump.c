@@ -2440,7 +2440,6 @@ For an example of its output, see L<Devel::Peek>.
 void
 Perl_sv_dump(pTHX_ SV *sv)
 {
-    PERL_ARGS_ASSERT_SV_DUMP;
     if (PL_in_sv_dump)
         return;
     else
