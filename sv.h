@@ -1233,7 +1233,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  define SvCUR(sv) (0 + ((XPV*) SvANY(sv))->xpv_cur)
 #  define SvCOW_META(sv) (0 + ((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
-#  define SvLEN_raw(sv) (0 + ((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_len)
+#  define SvLEN_raw(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
 #  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
 
@@ -1242,7 +1242,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #else /* ! PERL_DEBUG_COW */
 #  define SvCOW_META(sv) (((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
-#  define SvLEN_raw(sv) (((XPV*) SvANY(sv))->xpv_len_u.xpvlenu_len)
+#  define SvLEN_raw(sv) (((XPV*) SvANY(sv))->xpv_len)
 #  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
 
@@ -1421,7 +1421,7 @@ object type. Exposed to perl code via Internals::SvREADONLY().
                 assert(!isGV_with_GP(sv));                              \
                 assert(!(SvTYPE(sv) == SVt_PVIO                         \
                      && !(IoFLAGS(sv) & IOf_FAKE_DIRP)));               \
-                ((XPV*)SvANY(sv))->xpv_len_u.xpvlenu_len = (val);       \ /* NICO FIXME - check the flag */
+                ((XPV*)SvANY(sv))->xpv_len = (val);                     \ 
         } STMT_END
 
 #define SvPV_renew(sv,n) \
