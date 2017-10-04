@@ -5482,8 +5482,8 @@ Perl_sv_force_normal_flags(pTHX_ SV *const sv, const U32 flags)
             /* LV-as-regex has sv->sv_any pointing to an XPVLV body,
              * whose xpvlenu_rx field points to the regex body */
             XPV *xpv = (XPV*)(SvANY(sv));
-            old_rx_body = xpv->xpv_len_u.xpvlenu_rx;
-            xpv->xpv_len_u.xpvlenu_rx = NULL;
+            old_rx_body = xpv->xpv_rx;
+            xpv->xpv_rx = NULL;
         }
         else
             old_rx_body = ReANY((REGEXP *)sv);

@@ -1855,7 +1855,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
                 /* LV-as-REGEXP usurps len field to store pointer to
                  * regexp struct */
 		Perl_dump_indent(aTHX_ level, file, "  REGEXP = 0x%" UVxf "\n",
-                   PTR2UV(((XPV*)SvANY(sv))->xpv_len_u.xpvlenu_rx));
+                   PTR2UV(((XPV*)SvANY(sv))->xpv_rx));
             else
         {
         if (!re && !SvSHORTPV_TRUELY(sv))

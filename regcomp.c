@@ -19583,7 +19583,7 @@ Perl_reg_temp_copy(pTHX_ REGEXP *dsv, REGEXP *ssv)
              * we allocate here */
 	    REGEXP *temp = (REGEXP *)newSV_type(SVt_REGEXP);
 	    assert(!SvPVX(dsv));
-            ((XPV*)SvANY(dsv))->xpv_len_u.xpvlenu_rx = temp->sv_any;
+            ((XPV*)SvANY(dsv))->xpv_rx = temp->sv_any;
 	    temp->sv_any = NULL;
 	    SvFLAGS(temp) = (SvFLAGS(temp) & ~SVTYPEMASK) | SVt_NULL;
 	    SvREFCNT_dec_NN(temp);

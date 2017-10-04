@@ -496,7 +496,7 @@ typedef struct cow_meta_arena COW_META_ARENA;
 /* the len+other part of an XPV */
 struct xpv_nonbuf {
     union {
-        struct regexp* xpvlenu_rx; /* regex when SV body is XPVLV */ /* NICO FIXME - adjust macro */
+        struct regexp* xpvlenu_rx; /* regex when SV body is XPVLV */ /* view/use xpv_rx macro */
         STRLEN	xpvlenu_len; /* allocated size */
         char *	xpvlenu_pv;  /* regexp string */
         COW_META * xpvlenu_cow_meta; /* ref to refcount struct */ /* NICO FIXME - adjust macro */
@@ -517,6 +517,8 @@ struct xpv_nonbuf {
     } xpv_bufu;
 
 #define xpv_len	xpv_bufu.xpv_bufu_nonbuf.xpv_len_u.xpvlenu_len
+#define xpv_rx xpv_bufu.xpv_bufu_nonbuf.xpv_len_u.xpvlenu_rx
+
 
 #define SvSHORTPV_BUFSIZE      (sizeof(struct xpv_nonbuf))
 #define SvSHORTPV_BODY_FROM_PV(pv) \
