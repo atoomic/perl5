@@ -1234,7 +1234,6 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  define SvCOW_META(sv) (0 + ((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
 #  define SvLEN_raw(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
-#  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
 
 #  define SvMAGIC(sv)	(0 + *(assert_(SvTYPE(sv) >= SVt_PVMG) &((XPVMG*)  SvANY(sv))->xmg_u.xmg_magic))
@@ -1243,7 +1242,6 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  define SvCOW_META(sv) (((XPV*) SvANY(sv))->xpv_cow_meta)
 #  define SvLEN_cow_meta(sv) (SvCOW_META(sv) ? SvCOW_META(sv)->cm_len : 0)
 #  define SvLEN_raw(sv) (((XPV*) SvANY(sv))->xpv_len)
-#  define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_raw(sv))
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
 
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
@@ -1321,8 +1319,9 @@ object type. Exposed to perl code via Internals::SvREADONLY().
 #  endif
 #endif
 
-#define SvLEN(sv) (SvSHORTPV(sv) ? SvSHORTPV_BUFSIZE \
-                                 : ((XPV*) SvANY(sv))->xpv_len)
+#define SvLEN_shortpv(sv) (SvSHORTPV(sv) ? SvSHORTPV_BUFSIZE : SvLEN_raw(sv))
+/* FIXME add an assert !SvSHORTPV(sv) */
+#define SvLEN(sv) ((SvIsCOW(sv) && SvCOW_META(sv)) ? SvLEN_cow_meta(sv) : SvLEN_shortpv(sv))
 
 #ifndef PERL_POISON
 /* Given that these two are new, there can't be any existing code using them
