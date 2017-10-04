@@ -501,9 +501,11 @@ struct xpv_nonbuf {
         char *	xpvlenu_pv;  /* regexp string */
         COW_META * xpvlenu_cow_meta; /* ref to refcount struct - view/use xpv_cow_meta macro */
     } xpv_len_u;
-#ifdef PERL_COPY_ON_WRITE3
-    void* xpv_bufu_unused;   /* XXX reserved for future use */ /* NICO FIXME --- to merge with COW_META ?? */
-#endif
+/* Question: do we want the xpvlenu_cow_meta in the struct or outside  ???
+* - think this should go inside the struct
+* - cannot cow a shortpv - do not make sense anymore
+* we should remove the xpv_bufu_unused pointer
+*/
 };
 
 #define _XPV_HEAD							\
@@ -2009,7 +2011,7 @@ Like C<sv_utf8_upgrade>, but doesn't do magic on C<sv>.
 #   define SvCOW_REFCNT(sv)        (SvCOW_META(sv)->cm_refcnt)
 #   define SvCOW_FLAGS(sv)        (SvCOW_META(sv)->cm_flags)
 #   define SV_COW_REFCNT_MAX        (UV_MAX >> COW_META_FLAG_BITS)
-#   define CAN_COW_MASK	(SVf_POK|SVf_ROK|SVp_POK|SVf_FAKE|SVf_SHORTPV| \
+#   define CAN_COW_MASK	(SVf_POK|SVf_ROK|SVp_POK|SVf_FAKE| \
 			 SVf_OOK|SVf_BREAK|SVf_READONLY|SVf_PROTECT)
 #endif
 
