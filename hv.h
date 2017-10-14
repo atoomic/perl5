@@ -484,10 +484,14 @@ C<SV*>.
 #define hv_exists(hv, key, klen)					\
     cBOOL(hv_common_key_len((hv), (key), (klen), HV_FETCH_ISEXISTS, NULL, 0))
 
-#define hv_fetch(hv, key, klen, lval)					\
-    ((SV**) hv_common_key_len((hv), (key), (klen), (lval)		\
-			      ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)	\
-			      : HV_FETCH_JUST_SV, NULL, 0))
+/* same as hv_fetch but provide a pre computed hash */
+#define hv_fetch_hash(hv, key, klen, lval, hash)                   \
+     ((SV**) hv_common_key_len((hv), (key), (klen), (lval)       \
+                   ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)    \
+                   : HV_FETCH_JUST_SV, NULL, hash))
+
+/* common usage: we do not know the hash value for this key */
+#define hv_fetch(hv, key, klen, lval) hv_fetch_hash(hv, key, klen, lval, 0)
 
 #define hv_delete(hv, key, klen, flags)					\
     (MUTABLE_SV(hv_common_key_len((hv), (key), (klen),			\

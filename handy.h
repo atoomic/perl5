@@ -24,6 +24,39 @@
 #ifndef PERL_CORE
 #  define Null(type) ((type)NULL)
 
+/* 
+* this should move to its own .h file, we could probably auto generate it ?
+*/ 
+/* */
+enum common_core_keys {
+  CCK_STDOUT, 
+  CCK_STDERR,
+  CCK_STDIN,
+  CCK_ARGV
+  /* ... dynamically generated */
+};
+
+#define TOTAL_CCK_KEYS 4; /* Total number of Common Core Keys */
+
+
+U32 cck_hash_value[TOTAL_CCK_KEYS] = { 0 }; /* cache hash key on demand */
+const char *cck_str[TOTAL_CCK_KEYS] = { /* cache strings for CCK */
+  "STDOUT",
+  "STDERR",
+  "STDIN",
+  "ARGV"
+  /* ... dynamically generated */
+};
+
+const LEN cck_len[TOTAL_CCK_KEYS] = {
+  5,
+  5,
+  5,
+  4
+  /* ... dynamically generated */
+}
+
+
 /*
 =head1 Handy Values
 
@@ -412,17 +445,23 @@ a string/length pair.
 #define gv_stashpvs(str, create) \
     Perl_gv_stashpvn(aTHX_ STR_WITH_LEN(str), create)
 #define gv_fetchpvs(namebeg, add, sv_type) \
-    Perl_gv_fetchpvn_flags(aTHX_ STR_WITH_LEN(namebeg), add, sv_type)
+    gv_fetchpvn_flags(aTHX_ STR_WITH_LEN(namebeg), add, sv_type)
 #define gv_fetchpvn(namebeg, len, add, sv_type) \
-    Perl_gv_fetchpvn_flags(aTHX_ namebeg, len, add, sv_type)
+    gv_fetchpvn_flags(aTHX_ namebeg, len, add, sv_type)
 #define sv_catxmlpvs(dsv, str, utf8) \
     Perl_sv_catxmlpvn(aTHX_ dsv, STR_WITH_LEN(str), utf8)
 
+/* array of HEKs */
+#define gv_fetchpvs_hashed(enum_namebeg, add, sv_type) \
+  STMT_START { \
+    if (!cck_len[enum_hash]) PERL_HASH(cck_len[enum_hash], cck_str[enum_namebeg], cck_len[enum_namebeg]);
+    Perl_gv_fetchpvn_flags_hash(aTHX_ cck_str[enum_namebeg], cck_len[enum_namebeg], add, sv_type, cck_len[enum_hash]) \
+  } STMT_END
 
 #define lex_stuff_pvs(pv,flags) Perl_lex_stuff_pvn(aTHX_ STR_WITH_LEN(pv), flags)
 
 #define get_cvs(str, flags)					\
-	Perl_get_cvn_flags(aTHX_ STR_WITH_LEN(str), (flags))
+	   Perl_get_cvn_flags(aTHX_ STR_WITH_LEN(str), (flags))
 
 /*
 =head1 Miscellaneous Functions

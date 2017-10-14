@@ -2341,8 +2341,8 @@ S_maybe_multimagic_gv(pTHX_ GV *gv, const char *name, const svtype sv_type)
 }
 
 GV *
-Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
-		       const svtype sv_type)
+Perl_gv_fetchpvn_flags_hash(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
+		       const svtype sv_type, U32 hash)
 {
     const char *name = nambeg;
     GV *gv = NULL;
@@ -2379,7 +2379,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
     }
     
     /* By this point we should have a stash and a name */
-    gvp = (GV**)hv_fetch(stash,name,is_utf8 ? -(I32)len : (I32)len,add);
+    gvp = (GV**)hv_fetch_hash(stash,name,is_utf8 ? -(I32)len : (I32)len,add,hash);
     if (!gvp || *gvp == (const GV *)&PL_sv_undef) {
 	if (addmg) gv = (GV *)newSV(0);
 	else return NULL;
