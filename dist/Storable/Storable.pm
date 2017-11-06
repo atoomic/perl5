@@ -83,14 +83,8 @@ XSLoader::load('Storable', $Storable::VERSION);
 # Determine whether locking is possible, but only when needed.
 #
 
-sub CAN_FLOCK; my $CAN_FLOCK; sub CAN_FLOCK {
-	return $CAN_FLOCK if defined $CAN_FLOCK;
-	require Config; import Config;
-	return $CAN_FLOCK =
-		$Config{'d_flock'} ||
-		$Config{'d_fcntl_can_lock'} ||
-		$Config{'d_lockf'};
-}
+# assume any linux/darwin system can flock
+use constant CAN_FLOCK => $^O =~ qr{^(?:linux|darwin)$} ? 1 : 0;
 
 sub show_file_magic {
     print <<EOM;
