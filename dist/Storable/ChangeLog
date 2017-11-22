@@ -1,8 +1,13 @@
 ?????? p5p <perl5-porters@perl.org>
-    Version 2.65
+    Version 2.66
+
+	* Introduce Storable::flags to control 'bless' and 'tie'
+
+Mon Nov 20 14:20:33 PST 2017   Karen Etheridge <ether@cpan.org>
+	Version 2.65
 
 	* Replace multiple 'use vars' by 'our'
-	* remove Config dependency
+	* Remove Config dependency
 
 Wed Jul  2 16:25:25 IST 2014   Abhijit Menon-Sen <ams@toroid.org>
     Version 2.51
