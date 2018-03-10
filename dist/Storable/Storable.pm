@@ -80,16 +80,9 @@ BEGIN {
 # They might miss :flock in Fcntl
 #
 
-BEGIN {
-    if (eval { require Fcntl; 1 } && exists $Fcntl::EXPORT_TAGS{'flock'}) {
-        Fcntl->import(':flock');
-    } else {
-        eval q{
-	          sub LOCK_SH () { 1 }
-		  sub LOCK_EX () { 2 }
-	      };
-    }
-}
+# avoid to loading Fcntl
+sub LOCK_SH () { 1 }
+sub LOCK_EX () { 2 }
 
 sub CLONE {
     # clone context under threads
