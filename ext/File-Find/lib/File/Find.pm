@@ -11,8 +11,8 @@ our @EXPORT = qw(find finddepth);
 
 
 use strict;
-my $Is_VMS = $^O eq 'VMS';
-my $Is_Win32 = $^O eq 'MSWin32';
+use constant Is_VMS => 0;
+use constant Is_Win32 => 0;
 
 require File::Basename;
 require File::Spec;
@@ -139,7 +139,7 @@ sub _find_opt {
     local *_ = \my $a;
 
     my $cwd            = $wanted->{bydepth} ? Cwd::fastcwd() : Cwd::getcwd();
-    if ($Is_VMS) {
+    if (Is_VMS) {
 	# VMS returns this by default in VMS format which just doesn't
 	# work for the rest of this module.
 	$cwd = VMS::Filespec::unixpath($cwd);
@@ -179,11 +179,11 @@ sub _find_opt {
     Proc_Top_Item:
     foreach my $TOP (@_) {
 	my $top_item = $TOP;
-	$top_item = VMS::Filespec::unixify($top_item) if $Is_VMS;
+	$top_item = VMS::Filespec::unixify($top_item) if Is_VMS;
 
 	($topdev,$topino,$topmode,$topnlink) = $follow ? stat $top_item : lstat $top_item;
 
-	if ($Is_Win32) {
+	if (Is_Win32) {
 	    $top_item =~ s|[/\\]\z||
 	      unless $top_item =~ m{^(?:\w:)?[/\\]$};
 	}
@@ -202,7 +202,7 @@ sub _find_opt {
 		$abs_dir = $cwd;
 	    }
 	    else {  # care about any  ../
-		$top_item =~ s/\.dir\z//i if $Is_VMS;
+		$top_item =~ s/\.dir\z//i if Is_VMS;
 		$abs_dir = contract_name("$cwd/",$top_item);
 	    }
 	    $abs_dir= Follow_SymLink($abs_dir);
@@ -218,7 +218,7 @@ sub _find_opt {
 	    }
 
 	    if (-d _) {
-		$top_item =~ s/\.dir\z//i if $Is_VMS;
+		$top_item =~ s/\.dir\z//i if Is_VMS;
 		_find_dir_symlnk($wanted, $abs_dir, $top_item);
 		$Is_Dir= 1;
 	    }
@@ -230,7 +230,7 @@ sub _find_opt {
 		next Proc_Top_Item;
 	    }
 	    if (-d _) {
-		$top_item =~ s/\.dir\z//i if $Is_VMS;
+		$top_item =~ s/\.dir\z//i if Is_VMS;
 		_find_dir($wanted, $top_item, $topnlink);
 		$Is_Dir= 1;
 	    }
@@ -304,10 +304,10 @@ sub _find_dir($$$) {
     my $tainted = 0;
     my $no_nlink;
 
-    if ($Is_Win32) {
+    if (Is_Win32) {
 	$dir_pref
 	  = ($p_dir =~ m{^(?:\w:[/\\]?|[/\\])$} ? $p_dir : "$p_dir/" );
-    } elsif ($Is_VMS) {
+    } elsif (Is_VMS) {
 
 	#	VMS is returning trailing .dir on directories
 	#	and trailing . on files and symbolic links
@@ -337,7 +337,7 @@ sub _find_dir($$$) {
 		}
 	    }
 	}
-	unless (chdir ($Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
+	unless (chdir (Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
 	    warnings::warnif "Can't cd to $udir: $!\n";
 	    return;
 	}
@@ -370,7 +370,7 @@ sub _find_dir($$$) {
 		    }
 		}
 	    }
-	    unless (chdir ($Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
+	    unless (chdir (Is_VMS && $udir !~ /[\/\[<]+/ ? "./$udir" : $udir)) {
 		warnings::warnif "Can't cd to (" .
 		    ($p_dir ne '/' ? $p_dir : '') . "/) $udir: $!\n";
 		next;
@@ -400,7 +400,7 @@ sub _find_dir($$$) {
 	if ($nlink == 2 && !$no_nlink) {
 	    # This dir has no subdirectories.
 	    for my $FN (@filenames) {
-		if ($Is_VMS) {
+		if (Is_VMS) {
 		# Big hammer here - Compensate for VMS trailing . and .dir
 		# No win situation until this is changed, but this
 		# will handle the majority of the cases with breaking the fewest
@@ -408,7 +408,7 @@ sub _find_dir($$$) {
 		    $FN =~ s/\.dir\z//i;
 		    $FN =~ s#\.$## if ($FN ne '.');
 		}
-		next if $FN =~ $File::Find::skip_pattern;
+		next if $File::Find::skip_pattern ? $FN =~ $File::Find::skip_pattern : ($FN eq '.' || $FN eq '..');
 		
 		$name = $dir_pref . $FN; # $File::Find::name
 		$_ = ($no_chdir ? $name : $FN); # $_
@@ -426,7 +426,7 @@ sub _find_dir($$$) {
             my $stack_top = @Stack;
 
 	    for my $FN (@filenames) {
-		next if $FN =~ $File::Find::skip_pattern;
+		next if $File::Find::skip_pattern ? $FN =~ $File::Find::skip_pattern : ($FN eq '.' || $FN eq '..');
 		if ($subcount > 0 || $no_nlink) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
@@ -435,7 +435,7 @@ sub _find_dir($$$) {
 
 		    if (-d _) {
 			--$subcount;
-			$FN =~ s/\.dir\z//i if $Is_VMS;
+			$FN =~ s/\.dir\z//i if Is_VMS;
 			# HACK: replace push to preserve dir traversal order
 			#push @Stack,[$CdLvl,$dir_name,$FN,$sub_nlink];
 			splice @Stack, $stack_top, 0,
@@ -460,7 +460,7 @@ sub _find_dir($$$) {
 	    ($Level, $p_dir, $dir_rel, $nlink) = @$SE;
 	    if ($CdLvl > $Level && !$no_chdir) {
 		my $tmp;
-		if ($Is_VMS) {
+		if (Is_VMS) {
 		    $tmp = '[' . ('-' x ($CdLvl-$Level)) . ']';
 		}
 		else {
@@ -471,7 +471,7 @@ sub _find_dir($$$) {
 		$CdLvl = $Level;
 	    }
 
-	    if ($Is_Win32) {
+	    if (Is_Win32) {
 		$dir_name = ($p_dir =~ m{^(?:\w:[/\\]?|[/\\])$}
 		    ? "$p_dir$dir_rel" : "$p_dir/$dir_rel");
 		$dir_pref = "$dir_name/";
@@ -624,7 +624,7 @@ sub _find_dir_symlnk($$$) {
 	closedir($dh);
 
 	for my $FN (@filenames) {
-	    if ($Is_VMS) {
+	    if (Is_VMS) {
 	    # Big hammer here - Compensate for VMS trailing . and .dir
 	    # No win situation until this is changed, but this
 	    # will handle the majority of the cases with breaking the fewest.
@@ -632,7 +632,7 @@ sub _find_dir_symlnk($$$) {
 		$FN =~ s/\.dir\z//i;
 		$FN =~ s#\.$## if ($FN ne '.');
 	    }
-	    next if $FN =~ $File::Find::skip_pattern;
+		  next if $File::Find::skip_pattern ? $FN =~ $File::Find::skip_pattern : ($FN eq '.' || $FN eq '..');
 
 	    # follow symbolic links / do an lstat
 	    $new_loc = Follow_SymLink($loc_pref.$FN);
@@ -657,7 +657,7 @@ sub _find_dir_symlnk($$$) {
 	    }
 
 	    if (-d _) {
-		if ($Is_VMS) {
+		if (Is_VMS) {
 		    $FN =~ s/\.dir\z//i;
 		    $FN =~ s#\.$## if ($FN ne '.');
 		    $new_loc =~ s/\.dir\z//i;
@@ -767,14 +767,14 @@ sub finddepth {
 }
 
 # default
-$File::Find::skip_pattern    = qr/^\.{1,2}\z/;
+#$File::Find::skip_pattern    = qr/^\.{1,2}\z/;
 $File::Find::untaint_pattern = qr|^([-+@\w./]+)$|;
 
 # this _should_ work properly on all platforms
 # where File::Find can be expected to work
 $File::Find::current_dir = File::Spec->curdir || '.';
 
-$File::Find::dont_use_nlink = 1;
+$File::Find::dont_use_nlink = 0; # centos
 
 # We need a function that checks if a scalar is tainted. Either use the
 # Scalar::Util module's tainted() function or our (slower) pure Perl
