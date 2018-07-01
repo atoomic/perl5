@@ -25,7 +25,7 @@ List::Util->VERSION( $VERSION ); # Ensure we got the right XS version (RT#100863
 
 # populating @EXPORT_FAIL is done in the XS code
 sub export_fail {
-  if (grep { /^isvstring$/ } @_ ) {
+  if (grep {  $_ eq 'isvstring' } @_ ) {
     require Carp;
     Carp::croak("Vstrings are not implemented in this version of perl");
   }
