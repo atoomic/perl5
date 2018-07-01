@@ -36,12 +36,12 @@ unless (defined &isvstring) {
 }
 
 sub export_fail {
-  if (grep { /^(?:weaken|isweak)$/ } @_ ) {
+  if (grep { $_ eq 'weaken' || $_ eq 'isweak' } @_ ) {
     require Carp;
     Carp::croak("Weak references are not implemented in the version of perl");
   }
 
-  if (grep { /^isvstring$/ } @_ ) {
+  if (grep { $_ eq 'isvstring' } @_ ) {
     require Carp;
     Carp::croak("Vstrings are not implemented in the version of perl");
   }
