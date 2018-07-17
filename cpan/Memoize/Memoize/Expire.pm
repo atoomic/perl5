@@ -54,6 +54,7 @@ sub STORE {
   # The call that results in a value to store into the cache is the
   # first of the NUM_USES allowed calls.
   my $header = _make_header(time, $expire_time, $self->{NUM_USES}-1);
+  $value = '' unless defined $value;
   $self->{C}{$key} = $header . $value;
   $value;
 }
