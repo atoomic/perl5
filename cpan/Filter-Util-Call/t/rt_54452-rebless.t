@@ -8,6 +8,10 @@ if ($] < 5.004_55) {
 
 use strict;
 use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/.."; # required to load filter-util.pl
+
 BEGIN { unshift @INC, 't'; }
 
 require "filter-util.pl" ;

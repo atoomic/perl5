@@ -1,4 +1,8 @@
 use Config;
+
+use FindBin;
+use lib "$FindBin::Bin/.."; # required to load filter-util.pl
+
 BEGIN {
     if ($ENV{PERL_CORE}) {
         if ($Config{'extensions'} !~ m{\bFilter/Util/Call\b}) {
@@ -7,13 +11,14 @@ BEGIN {
         }
     }
     unshift @INC, 't';
-    require 'filter-util.pl';
 }
 
 use strict;
 use warnings;
 
 use vars qw($Inc $Perl);
+
+require 'filter-util.pl';
 
 print "1..34\n";
 
