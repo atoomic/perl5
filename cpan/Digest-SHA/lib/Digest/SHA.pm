@@ -4,15 +4,15 @@ require 5.003000;
 
 use strict;
 use warnings;
-use vars qw($VERSION @ISA @EXPORT_OK $errmsg);
-use Fcntl qw(O_RDONLY O_RDWR);
+use Fcntl ();
 use integer;
 
-$VERSION = '6.02';
+our $errmsg;
+our $VERSION = '6.02';
 
 require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(
 	$errmsg
 	hmac_sha1	hmac_sha1_base64	hmac_sha1_hex
 	hmac_sha224	hmac_sha224_base64	hmac_sha224_hex
@@ -121,7 +121,7 @@ sub addfile {
 
 	local *FH;
 	$file eq '-' and open(FH, '< -')
-		or sysopen(FH, $file, -d $file ? O_RDWR : O_RDONLY)
+		or sysopen(FH, $file, -d $file ? Fcntl::O_RDWR() : Fcntl::O_RDONLY())
 			or _bail('Open failed');
 
 	if ($BITS) {

@@ -4,8 +4,7 @@ use strict;
 use Digest::SHA qw(sha1);
 
 package P1;
-use vars qw(@ISA);
-@ISA = ("Digest::SHA");
+our @ISA = ("Digest::SHA");
 
 package main;
 
