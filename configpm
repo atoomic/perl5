@@ -846,7 +846,7 @@ sub DESTROY { }
 
 sub AUTOLOAD {
     require 'Config_heavy.pl';
-    goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
+    goto \&launcher unless length($Config::AUTOLOAD) >= 8 && substr($Config::AUTOLOAD,-8) eq 'launcher';
     die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
 }
 
