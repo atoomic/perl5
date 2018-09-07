@@ -17,15 +17,13 @@ use warnings;
 
 package Getopt::Long;
 
-use vars qw($VERSION);
-$VERSION        =  2.52;
+our $VERSION        =  2.52;
+
 # For testing versions only.
-use vars qw($VERSION_STRING);
-$VERSION_STRING = "2.52";
+our $VERSION_STRING = "2.52";
 
 use Exporter;
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 # Exported subroutines.
 sub GetOptions(@);		# always
@@ -35,21 +33,28 @@ sub Configure(@);		# on demand
 sub HelpMessage(@);		# on demand
 sub VersionMessage(@);		# in demand
 
+
+################ Initialization ################
+# Values for $order. See GNU getopt.c for details.
+our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
+# Version major/minor numbers.
+our ($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
+
+our (@EXPORT, @EXPORT_OK);
 BEGIN {
-    # Init immediately so their contents can be used in the 'use vars' below.
     @EXPORT    = qw(&GetOptions $REQUIRE_ORDER $PERMUTE $RETURN_IN_ORDER);
     @EXPORT_OK = qw(&HelpMessage &VersionMessage &Configure
 		    &GetOptionsFromArray &GetOptionsFromString);
 }
 
 # User visible variables.
-use vars @EXPORT, @EXPORT_OK;
-use vars qw($error $debug $major_version $minor_version);
+our ($error, $debug );
+
 # Deprecated visible variables.
-use vars qw($autoabbrev $getopt_compat $ignorecase $bundling $order
+our ($autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	    $passthrough);
 # Official invisible variables.
-use vars qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
+our ($genprefix, $caller, $gnu_compat, $auto_help, $auto_version, $longprefix);
 
 # Really invisible variables.
 my $bundling_values;
@@ -120,13 +125,6 @@ sub import {
     # And configure.
     Configure(@config) if @config;
 }
-
-################ Initialization ################
-
-# Values for $order. See GNU getopt.c for details.
-($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2);
-# Version major/minor numbers.
-($major_version, $minor_version) = $VERSION =~ /^(\d+)\.(\d+)/;
 
 ConfigDefaults();
 
