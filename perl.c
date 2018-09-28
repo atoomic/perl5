@@ -353,7 +353,7 @@ perl_construct(pTHXx)
         /* SHAREKEYS tells us that the hash has its keys shared with PL_strtab,
          * which is not the case with PL_strtab itself */
         HvSHAREKEYS_off(PL_strtab);			/* mandatory */
-        hv_ksplit(PL_strtab, 1 << 11);
+        hv_ksplit(PL_strtab, 1 << 9); /* 5.26: 1 << 9 = 512 ; 5.28: 1 << 11 = 2048 */
     }
 
     Zero(PL_sv_consts, SV_CONSTS_COUNT, SV*);
