@@ -7119,7 +7119,7 @@ PP(pp_argcheck)
 {
     OP * const o       = PL_op;
     struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXo->op_aux;
-    UV   params        = aux->params;
+    IV   params        = aux->params;
     UV   opt_params    = aux->opt_params;
     char slurpy        = aux->slurpy;
     AV  *defav         = GvAV(PL_defgv); /* @_ */
