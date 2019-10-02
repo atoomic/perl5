@@ -2340,9 +2340,9 @@ Adp	|int	|nothreadhook
 p	|void	|init_constants
 
 #if defined(PERL_IN_DOOP_C)
-SR	|Size_t	|do_trans_simple	|NN SV * const sv
-SR	|Size_t	|do_trans_count		|NN SV * const sv
-SR	|Size_t	|do_trans_complex	|NN SV * const sv
+SR	|Size_t	|do_trans_simple	|NN SV * const sv|NN OPtrans_map * tbl
+SR	|Size_t	|do_trans_count		|NN SV * const sv|NN OPtrans_map * tbl
+SR	|Size_t	|do_trans_complex	|NN SV * const sv|NN OPtrans_map * tbl
 SR	|Size_t	|do_trans_simple_utf8	|NN SV * const sv
 SR	|Size_t	|do_trans_count_utf8	|NN SV * const sv
 SR	|Size_t	|do_trans_complex_utf8	|NN SV * const sv
