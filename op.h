@@ -1112,6 +1112,11 @@ C<sib> is non-null. For a higher-level interface, see C<L</op_sibling_splice>>.
       "%s operator is deprecated. This will be a fatal error in "   \
       "Perl 5.32"
 #endif
+#if defined(PERL_IN_OP_C) || defined(PERL_IN_DOOP_C)
+#  define TR_UNMAPPED           (UV)-1
+#  define TR_DELETE             (UV)-2
+#  define TR_R_EMPTY            (UV)-3  /* rhs (replacement) is empty */
+#endif
 #if defined(PERL_IN_OP_C) || defined(PERL_IN_TOKE_C)
 #define RANGE_INDICATOR  ILLEGAL_UTF8_BYTE
 #endif

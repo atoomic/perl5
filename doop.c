@@ -175,7 +175,7 @@ S_do_trans_complex(pTHX_ SV * const sv, OPtrans_map * tbl)
 		    if (p != d - 1 || *p != *d)
 			p = d++;
 		}
-		else if (ch == -1)	/* -1 is unmapped character */
+		else if (ch == TR_UNMAPPED)
 		    *d++ = *s;	
 		else if (ch == -2)	/* -2 is delete character */
 		    matches++;
@@ -189,9 +189,9 @@ S_do_trans_complex(pTHX_ SV * const sv, OPtrans_map * tbl)
 		    matches++;
 		    *d++ = (U8)ch;
 		}
-		else if (ch == -1)	/* -1 is unmapped character */
+		else if (ch == TR_UNMAPPED)
 		    *d++ = *s;
-		else if (ch == -2)      /* -2 is delete character */
+		else if (ch == TR_DELETE)
 		    matches++;
 		s++;
 	    }
@@ -233,14 +233,14 @@ S_do_trans_complex(pTHX_ SV * const sv, OPtrans_map * tbl)
                 s += len;
                 continue;
             }
-            else if (sch == -1) {	/* -1 is unmapped character */
+            else if (sch == TR_UNMAPPED) {
                 Move(s, d, len, U8);
                 d += len;
             }
-            else if (sch == -2)     /* -2 is delete character */
+            else if (sch == TR_DELETE)
                 matches++;
             else {
-                assert(sch == -3);  /* -3 is empty replacement */
+                assert(sch == TR_R_EMPTY);  /* empty replacement */
                 ch = comp;
                 goto replace;
             }
