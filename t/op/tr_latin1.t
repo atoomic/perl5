@@ -13,6 +13,8 @@ plan tests => 1;
   # for the final \xff needs to be mallocd, and that's what caused the
   # problem, because the '-' had already been parsed and was later added
   # without making space for it
+    # \x85 should work, but doesn't, but maybe in the rework it will
+##U+0085: \xC2\x85	\x85	\x25	*\x15	*\x25	    1.1 NEXT LINE
     fresh_perl_is('print "\x8c" =~ y o\x{100}ÄŒÿÿ€€-ÿoo', "1", { },
                     'RT #134067 heap-buffer-overflow in S_scan_const');
 

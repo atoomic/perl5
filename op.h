@@ -170,6 +170,8 @@ Deprecated.  Use C<GIMME_V> instead.
 
 
 #define OPpTRANS_ALL	(OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF|OPpTRANS_IDENTICAL|OPpTRANS_SQUASH|OPpTRANS_COMPLEMENT|OPpTRANS_GROWS|OPpTRANS_DELETE)
+#define OPpTRANS_SRC_IS_UTF8    OPpTRANS_TO_UTF
+#define OPpTRANS_CAN_FORCE_UTF8 OPpTRANS_FROM_UTF
 
 
 
@@ -1112,10 +1114,13 @@ C<sib> is non-null. For a higher-level interface, see C<L</op_sibling_splice>>.
       "%s operator is deprecated. This will be a fatal error in "   \
       "Perl 5.32"
 #endif
-#if defined(PERL_IN_OP_C) || defined(PERL_IN_DOOP_C)
+#if defined(PERL_IN_OP_C) || defined(PERL_IN_DOOP_C) || defined(PERL_IN_PERL_C)
 #  define TR_UNMAPPED           (UV)-1
 #  define TR_DELETE             (UV)-2
-#  define TR_R_EMPTY            (UV)-3  /* rhs (replacement) is empty */
+#  define TR_R_EMPTY            (UV)-3  /* rhs, replacement is empty */
+#  define TR_OOB                (UV)-4  /* Something that isn't one of the others */
+#  define TR_SPECIAL_HANDLING   TR_DELETE /* Can occupy same value */
+#  define TR_UNLISTED           TR_UNMAPPED /* A synonym XXX */
 #endif
 #if defined(PERL_IN_OP_C) || defined(PERL_IN_TOKE_C)
 #define RANGE_INDICATOR  ILLEGAL_UTF8_BYTE

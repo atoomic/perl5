@@ -1305,7 +1305,7 @@ S_do_op_dump_bar(pTHX_ I32 level, UV bar, PerlIO *file, const OP *o)
 
     case OP_TRANS:
     case OP_TRANSR:
-        if (o->op_private & (OPpTRANS_FROM_UTF | OPpTRANS_TO_UTF)) {
+        if (o->op_private & OPpTRANS_TO_UTF) {
             /* utf8: table stored as a swash */
 #ifndef USE_ITHREADS
 	/* with ITHREADS, swash is stored in the pad, and the right pad
@@ -1316,6 +1316,7 @@ S_do_op_dump_bar(pTHX_ I32 level, UV bar, PerlIO *file, const OP *o)
 #endif
         }
         else {
+            /* XXX */
             const OPtrans_map * const tbl = (OPtrans_map*)cPVOPo->op_pv;
             SSize_t i, size = tbl->size;
 
@@ -2986,11 +2987,10 @@ Perl_op_class(pTHX_ const OP *o)
          * pointer to a table of shorts used to look up translations.
          * Under utf8, however, a simple table isn't practical; instead,
          * the OP is an SVOP (or, under threads, a PADOP),
-         * and the SV is a reference to a swash
-         * (i.e., an RV pointing to an HV).
+         * and the SV is an AV.
          */
 	return (!custom &&
-		   (o->op_private & (OPpTRANS_TO_UTF|OPpTRANS_FROM_UTF))
+		   (o->op_private & OPpTRANS_TO_UTF)
 	       )
 #if  defined(USE_ITHREADS)
 		? OPclass_PADOP : OPclass_PVOP;

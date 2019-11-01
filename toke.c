@@ -2917,6 +2917,8 @@ S_scan_const(pTHX_ char *start)
                                            when the source isn't utf8, as for
                                            example when it is entirely composed
                                            of hex constants */
+    /* XXX could keep track of first variant as well. then a version of
+     * utf8_upgrade wouldn't have to do scanning */
     STRLEN utf8_variant_count = 0;      /* When not in UTF-8, this counts the
                                            number of characters found so far
                                            that will expand (into 2 bytes)
@@ -2959,8 +2961,8 @@ S_scan_const(pTHX_ char *start)
     assert(PL_lex_inwhat != OP_TRANSR);
     if (PL_lex_inwhat == OP_TRANS && PL_parser->lex_sub_op) {
 	/* If we are doing a trans and we know we want UTF8 set expectation */
-	d_is_utf8  = PL_parser->lex_sub_op->op_private & (OPpTRANS_FROM_UTF|OPpTRANS_TO_UTF);
-	s_is_utf8  = PL_parser->lex_sub_op->op_private & (PL_lex_repl ? OPpTRANS_FROM_UTF : OPpTRANS_TO_UTF);
+	d_is_utf8  = PL_parser->lex_sub_op->op_private & OPpTRANS_TO_UTF;
+	s_is_utf8  = PL_parser->lex_sub_op->op_private & OPpTRANS_TO_UTF;
     }
 
     /* Protect sv from errors and fatal warnings. */
@@ -3007,7 +3009,8 @@ S_scan_const(pTHX_ char *start)
                  * is not a hyphen; or if it is a hyphen, but it's too close to
                  * either edge to indicate a range, or if we haven't output any
                  * characters yet then it's a regular character. */
-                if (*s != '-' || s >= send - 1 || s == start || d == SvPVX(sv)) {
+                if (*s != '-' || s >= send - 1 || s == start || d == SvPVX(sv))
+                {
 
                     /* A regular character.  Process like any other, but first
                      * clear any flags */
@@ -3065,7 +3068,7 @@ S_scan_const(pTHX_ char *start)
                  * 'offset_to_max' is the offset in 'sv' at which the character
                  *      (the range's maximum end point) before 'd'  begins.
                  */
-                char * max_ptr = SvPVX(sv) + offset_to_max;
+                char * max_ptr;
                 char * min_ptr;
                 IV range_min;
 		IV range_max;	/* last character in range */
@@ -3077,6 +3080,8 @@ S_scan_const(pTHX_ char *start)
                 IV real_range_max = 0;
 #endif
                 /* Get the code point values of the range ends. */
+                max_ptr = (d_is_utf8) ? (char *) utf8_hop( (U8*) d, -1) : d - 1;
+                offset_to_max = max_ptr - SvPVX_const(sv);
                 if (d_is_utf8) {
                     /* We know the utf8 is valid, because we just constructed
                      * it ourselves in previous loop iterations */
@@ -3659,9 +3664,7 @@ S_scan_const(pTHX_ char *start)
 			if (PL_lex_inwhat == OP_TRANS
                             && PL_parser->lex_sub_op)
                         {
-			    PL_parser->lex_sub_op->op_private |=
-				(PL_lex_repl ? OPpTRANS_FROM_UTF
-					     : OPpTRANS_TO_UTF);
+			    PL_parser->lex_sub_op->op_private |= OPpTRANS_SRC_IS_UTF8;
 			}
 		    }
 		}
@@ -4144,8 +4147,7 @@ S_scan_const(pTHX_ char *start)
     if (d_is_utf8) {
 	SvUTF8_on(sv);
 	if (PL_lex_inwhat == OP_TRANS && PL_parser->lex_sub_op) {
-	    PL_parser->lex_sub_op->op_private |=
-		    (PL_lex_repl ? OPpTRANS_FROM_UTF : OPpTRANS_TO_UTF);
+	    PL_parser->lex_sub_op->op_private |= OPpTRANS_TO_UTF;
 	}
     }
 
@@ -10299,7 +10301,6 @@ S_scan_trans(pTHX_ char *start)
     o = newPVOP(nondestruct ? OP_TRANSR : OP_TRANS, 0, (char*)NULL);
     o->op_private &= ~OPpTRANS_ALL;
     o->op_private |= del|squash|complement|
-      (DO_UTF8(PL_lex_stuff)? OPpTRANS_FROM_UTF : 0)|
       (DO_UTF8(PL_parser->lex_sub_repl) ? OPpTRANS_TO_UTF   : 0);
 
     PL_lex_op = o;
