@@ -1688,34 +1688,21 @@ PV(sv)
 	} else if (ix) {
 	    p = isREGEXP(sv) ? RX_WRAPPED((REGEXP*)sv) : SvPVX(sv);
 	    len = strlen(p);
-	} else if (SvPOK(sv)) {
+      /* note:  we would like to check the SvPOKp(sv) for INVLIST but this is not set right now */
+	} else if (SvPOK(sv) || SvTYPE(sv) == SVt_INVLIST ) { 
 	    len = SvCUR(sv);
 	    p = SvPVX_const(sv);
 	    utf8 = SvUTF8(sv);
-        } else if (isREGEXP(sv)) {
+    } else if (isREGEXP(sv)) {
 	    len = SvCUR(sv);
 	    p = RX_WRAPPED_const((REGEXP*)sv);
 	    utf8 = SvUTF8(sv);
 	} else {
-            /* XXX for backward compatibility, but should fail */
-            /* croak( "argument is not SvPOK" ); */
+      /* XXX for backward compatibility, but should fail */
+      /* croak( "argument is not SvPOK" ); */
+      Perl_warn(aTHX_ "B::PV 0x%0x flags: 0x%0x has no valid PV set.\n", sv, SvTYPE(sv), SvFLAGS(sv));            
 	    p = NULL;
-        }
-	ST(0) = newSVpvn_flags(p, len, SVs_TEMP | utf8);
-
-MODULE = B	PACKAGE = B::INVLIST
-
-void
-PV(sv)
-	B::PV	sv
-    PREINIT:
-	const char *p;
-	STRLEN len = 0;
-	U32 utf8 = 0;
-    CODE:
-        len = SvCUR(sv);
-        p = SvPVX_const(sv);
-        utf8 = SvUTF8(sv);
+  }
 	ST(0) = newSVpvn_flags(p, len, SVs_TEMP | utf8);
 
 MODULE = B	PACKAGE = B::PVMG
