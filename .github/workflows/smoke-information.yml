@@ -28,4 +28,6 @@ jobs:
                 echo git merge-base origin/${GITHUB_BASE_REF} ${GITHUB_HEAD_REF}
                 branch_off=$(git merge-base origin/${GITHUB_BASE_REF} ${GITHUB_HEAD_REF})
                 git log --pretty=format:"Author: %an <%ae>" $branch_off..${GITHUB_SHA}^2
+            else
+              true; # no failures on personal clones
             fi
