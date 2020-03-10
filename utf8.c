@@ -60,8 +60,6 @@ within non-zero characters.
 static void
 S_restore_cop_warnings(pTHX_ void *p)
 {
-    if (!specialWARN(PL_curcop->cop_warnings))
-        PerlMemShared_free(PL_curcop->cop_warnings);
     PL_curcop->cop_warnings = (STRLEN*)p;
 }
 

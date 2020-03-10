@@ -1260,8 +1260,6 @@ S_cop_free(pTHX_ COP* cop)
     PERL_ARGS_ASSERT_COP_FREE;
 
     CopFILE_free(cop);
-    if (! specialWARN(cop->cop_warnings))
-	PerlMemShared_free(cop->cop_warnings);
     cophh_free(CopHINTHASH_get(cop));
     if (PL_curcop == cop)
        PL_curcop = NULL;
@@ -17183,14 +17181,19 @@ Perl_dup_warnings(pTHX_ STRLEN* warnings)
 {
     Size_t size;
     STRLEN *new_warnings;
+    U32 hash = 0;
+
+    return warnings; /* experimental */
 
     if (warnings == NULL || specialWARN(warnings))
         return warnings;
 
     size = sizeof(*warnings) + *warnings;
 
-    new_warnings = (STRLEN*)PerlMemShared_malloc(size);
-    Copy(warnings, new_warnings, size, char);
+    if (!hash)
+      PERL_HASH(hash, (char*)warnings, size);
+    new_warnings = (STRLEN*) sharepvn((char*)warnings, size, hash);
+
     return new_warnings;
 }
 
