@@ -2148,8 +2148,7 @@ Perl_my_setenv(pTHX_ const char *nam, const char *val)
 #    endif
 
 #    ifdef USE_ITHREADS
-  /* only parent thread can modify process environment, so no need to use a
-   * mutex */
+  /* only parent thread can modify process environment */
   if (PL_curinterp == aTHX)
 #    endif
   {
@@ -5179,8 +5178,7 @@ Perl_my_clearenv(pTHX)
 #  else /* ! (PERL_IMPLICIT_SYS || WIN32) */
 #    if defined(USE_ENVIRON_ARRAY)
 #      if defined(USE_ITHREADS)
-    /* only the parent thread can clobber the process environment, so no need
-     * to use a mutex */
+    /* only the parent thread can clobber the process environment */
     if (PL_curinterp == aTHX)
 #      endif /* USE_ITHREADS */
     {
