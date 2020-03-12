@@ -19,6 +19,7 @@ jobs:
         CONTINUOUS_INTEGRATION: 1
 
     strategy:
+        fail-fast: false
         matrix:
             # exercise a variety of build options
             # threads often cause build issues
@@ -30,16 +31,11 @@ jobs:
               - "-Duseshrplib -Dusequadmath -Dusecbacktrace -Dusethreads PERL_UNICODE='' LANG='de_DE.UTF-8'"
               - "-Duserelocatableinc"
               - "-Dcc='clang'"
-              - "-Dcc='gcc' -Accflags='-m32' -Aldflags='-m32' -Alddlflags='-shared -m32'"
 
     steps:
       - uses: actions/checkout@master
         with:
             fetch-depth: 10
-      - name: Install 32bit dependencies
-        run: |
-            sudo dpkg --add-architecture i386 ||:
-            sudo apt-get -y install gcc-multilib ||:
       - name: Configure
         run: |
             ./Configure -des -Dusedevel ${{ matrix.CONFIGURE_ARGS }} -Dprefix="$HOME/perl-blead" -DDEBUGGING
