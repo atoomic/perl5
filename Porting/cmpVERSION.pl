@@ -38,8 +38,10 @@ my $null = devnull();
 
 unless (defined $tag_to_compare) {
     my $check = 'HEAD';
-    while(1) {
+    print "# WHICH GIT: " . qx{which git};
+    while(1) {            
         $check = `git describe --abbrev=0 $check 2>$null`;
+        print "# check $check\n";
         chomp $check;
         last unless $check =~ /-RC/;
         $check .= '~1';

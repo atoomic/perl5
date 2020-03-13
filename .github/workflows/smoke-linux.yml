@@ -37,7 +37,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
             fetch-depth: 0
-      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: git fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Configure
         run: |
             ./Configure -des -Dusedevel ${{ matrix.CONFIGURE_ARGS }} -Dprefix="$HOME/perl-blead" -DDEBUGGING
