@@ -28,6 +28,8 @@ my $source;
 
 if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
 	$source = $ENV{WORKSPACE};
+	$ENV{GIT_DIR} = $ENV{WORKSPACE} . '/.git';
+	die q[no .git directory...] unless -d $ENV{GIT_DIR};
 } else {
 	require './t/test.pl';
 	$source = find_git_or_skip('all');
