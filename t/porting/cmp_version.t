@@ -24,17 +24,8 @@ BEGIN {
 use TestInit qw(T A); # T is chdir to the top level, A makes paths absolute
 use strict;
 
-my $source;
-
-if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
-	$source = $ENV{WORKSPACE};
-	$ENV{GIT_DIR} = $ENV{WORKSPACE} . '/.git';
-	die q[no .git directory...] unless -d $ENV{GIT_DIR};
-} else {
-	require './t/test.pl';
-	$source = find_git_or_skip('all');
-}
-
+require './t/test.pl';
+my $source = find_git_or_skip('all');
 chdir $source or die "Can't chdir to $source: $!";
 
 system "$^X Porting/cmpVERSION.pl --tap";
