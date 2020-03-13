@@ -37,8 +37,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
             fetch-depth: 0
-      - name: git fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: git cfg + fetch tags
+        run: |
+          git config diff.renameLimit 999999
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Configure
         run: |
             ./Configure -des -Dusedevel ${{ matrix.CONFIGURE_ARGS }} -Dprefix="$HOME/perl-blead" -DDEBUGGING
@@ -48,6 +50,9 @@ jobs:
       - name: Run Tests
         run: |
             TEST_JOBS=2 make -j2 test
+      - name: t/porting/cmp_version.t
+        run: |
+            ${{ github.workspace }}/t/perl ${{ github.workspace }}/t/porting/cmp_version.t
       - name: t/porting/cmp_version.t
         run: |
             ${{ github.workspace }}/t/perl ${{ github.workspace }}/t/porting/cmp_version.t
