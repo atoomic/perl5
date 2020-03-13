@@ -174,49 +174,59 @@ sub skip_all_without_unicode_tables { # (but only under miniperl)
 }
 
 sub find_git_or_skip {
-    my ($source_dir, $reason);
-    if (-d '.git') {
-	$source_dir = '.';
-    } elsif (-l 'MANIFEST' && -l 'AUTHORS') {
-	my $where = readlink 'MANIFEST';
-	die "Can't readling MANIFEST: $!" unless defined $where;
-	die "Confusing symlink target for MANIFEST, '$where'"
-	    unless $where =~ s!/MANIFEST\z!!;
-	if (-d "$where/.git") {
-	    # Looks like we are in a symlink tree
-	    if (exists $ENV{GIT_DIR}) {
-		diag("Found source tree at $where, but \$ENV{GIT_DIR} is $ENV{GIT_DIR}. Not changing it");
-	    } else {
-		note("Found source tree at $where, setting \$ENV{GIT_DIR}");
-		$ENV{GIT_DIR} = "$where/.git";
-	    }
-	    $source_dir = $where;
-	}
-    } elsif (exists $ENV{GIT_DIR}) {
-	my $commit = '8d063cd8450e59ea1c611a2f4f5a21059a2804f1';
-	my $out = `git rev-parse --verify --quiet '$commit^{commit}'`;
-	chomp $out;
-	if($out eq $commit) {
-	    $source_dir = '.'
-	}
+    my ( $source_dir, $reason );
+    if ( -d '.git' ) {
+        $source_dir = '.';
     }
-    if ($ENV{'PERL_BUILD_PACKAGING'}) {
-	$reason = 'PERL_BUILD_PACKAGING is set';
-    } elsif ($source_dir) {
-	my $version_string = `git --version`;
-	if (defined $version_string
-	      && $version_string =~ /\Agit version (\d+\.\d+\.\d+)(.*)/) {
-	    return $source_dir if eval "v$1 ge v1.5.0";
-	    # If you have earlier than 1.5.0 and it works, change this test
-	    $reason = "in git checkout, but git version '$1$2' too old";
-	} else {
-	    $reason = "in git checkout, but cannot run git";
-	}
-    } else {
-	$reason = 'not being run from a git checkout';
+    elsif ( -l 'MANIFEST' && -l 'AUTHORS' ) {
+        my $where = readlink 'MANIFEST';
+        die "Can't readling MANIFEST: $!" unless defined $where;
+        die "Confusing symlink target for MANIFEST, '$where'"
+            unless $where =~ s!/MANIFEST\z!!;
+        if ( -d "$where/.git" ) {
+
+            # Looks like we are in a symlink tree
+            if ( exists $ENV{GIT_DIR} ) {
+                diag(
+                    "Found source tree at $where, but \$ENV{GIT_DIR} is $ENV{GIT_DIR}. Not changing it"
+                );
+            }
+            else {
+                note("Found source tree at $where, setting \$ENV{GIT_DIR}");
+                $ENV{GIT_DIR} = "$where/.git";
+            }
+            $source_dir = $where;
+        }
+    }
+    elsif ( exists $ENV{GIT_DIR} ) {
+        my $commit = '8d063cd8450e59ea1c611a2f4f5a21059a2804f1';
+        my $out    = `git rev-parse --verify --quiet '$commit^{commit}'`;
+        chomp $out;
+        if ( $out eq $commit ) {
+            $source_dir = '.';
+        }
+    }
+    if ( $ENV{'PERL_BUILD_PACKAGING'} ) {
+        $reason = 'PERL_BUILD_PACKAGING is set';
+    }
+    elsif ($source_dir) {
+        my $version_string = `git --version`;
+        if ( defined $version_string
+            && $version_string =~ /\Agit version (\d+\.\d+\.\d+)(.*)/ ) {
+            return $source_dir if eval "v$1 ge v1.5.0";
+
+            # If you have earlier than 1.5.0 and it works, change this test
+            $reason = "in git checkout, but git version '$1$2' too old";
+        }
+        else {
+            $reason = "in git checkout, but cannot run git";
+        }
+    }
+    else {
+        $reason = 'not being run from a git checkout';
     }
     skip_all($reason) if $_[0] && $_[0] eq 'all';
-    skip($reason, @_);
+    skip( $reason, @_ );
 }
 
 sub BAIL_OUT {
