@@ -175,6 +175,11 @@ sub skip_all_without_unicode_tables { # (but only under miniperl)
 
 sub find_git_or_skip {
     my ( $source_dir, $reason );
+
+    if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
+        return $ENV{WORKSPACE}; # do not skip some porting tests like cmp_version.t
+    }
+
     if ( -d '.git' ) {
         $source_dir = '.';
     }
