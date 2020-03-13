@@ -20,6 +20,7 @@ jobs:
         env:
           PERL_SKIP_TTY_TEST: 1
           CONTINUOUS_INTEGRATION: 1
+          WORKSPACE: ${{ github.workspace }}
 
     strategy:
         fail-fast: false

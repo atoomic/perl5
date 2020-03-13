@@ -26,6 +26,11 @@ use strict;
 
 require './t/test.pl';
 my $source = find_git_or_skip('all');
+
+if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
+	$source = $ENV{WORKSPACE};
+}
+
 chdir $source or die "Can't chdir to $source: $!";
 
 system "$^X Porting/cmpVERSION.pl --tap";
