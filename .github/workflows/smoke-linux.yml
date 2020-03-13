@@ -48,4 +48,4 @@ jobs:
             TEST_JOBS=2 make -j2 test
       - name: t/porting/cmp_version.t
         run: |
-            ./perl t/porting/cmp_version.t
+            ${{ github.workspace }}/t/perl ${{ github.workspace }}/t/porting/cmp_version.t

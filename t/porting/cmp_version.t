@@ -24,13 +24,12 @@ BEGIN {
 use TestInit qw(T A); # T is chdir to the top level, A makes paths absolute
 use strict;
 
-require './t/test.pl';
-
 my $source;
 
 if ( $ENV{CONTINUOUS_INTEGRATION} && $ENV{WORKSPACE} ) {
 	$source = $ENV{WORKSPACE};
 } else {
+	require './t/test.pl';
 	$source = find_git_or_skip('all');
 }
 
