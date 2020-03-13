@@ -46,3 +46,6 @@ jobs:
       - name: Run Tests
         run: |
             TEST_JOBS=2 make -j2 test
+      - name: t/porting/cmp_version.t
+        run: |
+            ./perl t/porting/cmp_version.t
