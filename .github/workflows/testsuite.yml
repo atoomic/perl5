@@ -75,6 +75,17 @@ jobs:
           - "-Dcc='clang'"
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -113,6 +124,17 @@ jobs:
           - "-Dusedevel"
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - name: Install System dependencies
         run: |
           apt-get update ||:
@@ -152,6 +174,17 @@ jobs:
       CONTINUOUS_INTEGRATION: 1
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - uses: actions/checkout@master
         with:
           fetch-depth: 10
@@ -182,6 +215,17 @@ jobs:
       CONTINUOUS_INTEGRATION: 1
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -231,6 +275,17 @@ jobs:
       CONTINUOUS_INTEGRATION: 1
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -266,6 +321,17 @@ jobs:
       CONTINUOUS_INTEGRATION: 1
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -302,6 +368,17 @@ jobs:
       CONTINUOUS_INTEGRATION: 1
 
     steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+        run: |
+          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - name: Set up Cygwin
         shell: cmd
