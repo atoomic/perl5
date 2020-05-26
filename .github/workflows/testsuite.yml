@@ -30,14 +30,16 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@master
         with:
-          fetch-depth: 10
+          fetch-depth: 1000
       - name: Involved authors
         run: |
           echo "Pull request authors"
-          git fetch origin >/dev/null 2>&1
-          echo "# git merge-base origin/${GITHUB_BASE_REF} HEAD"
-          branch_off=$(git merge-base origin/${GITHUB_BASE_REF} HEAD)
-          git log --pretty=format:"Author: %an <%ae>" $branch_off..${GITHUB_SHA::8}^2 | sort | uniq
+          echo "# git merge-base origin/${BASE_REF} HEAD"
+          branch_off=$(git merge-base origin/${BASE_REF} HEAD)
+          git log --pretty=format:"Author: %an <%ae>" $branch_off..${SHA::8}^2 | sort -u
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          SHA: ${{ github.sha }}
 
   #  ___            _ _           ___ _           _
   # / __| __ _ _ _ (_) |_ _  _   / __| |_  ___ __| |__
@@ -80,6 +82,24 @@ jobs:
         run: |
           TEST_JOBS=2 make -j2 test
 
+  check_full_test_suite:
+    name: "Check if ENABLE_FULL_TEST_SUITE set"
+    runs-on: ubuntu-latest
+    timeout-minutes: 120    
+
+    steps:
+      # --------------------------------------------------------------------------------------------
+      # cannot use secrets earlier as part of 'if:' condition
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
+        run: |
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 78
+          fi
+        env:
+          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
+      # --------------------------------------------------------------------------------------------
+
   #  _ _
   # | (_)_ _ _  ___ __
   # | | | ' \ || \ \ /
@@ -88,7 +108,7 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
@@ -110,17 +130,6 @@ jobs:
           - "-Dcc='clang'"
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -144,7 +153,7 @@ jobs:
     name: "linux i386/ubuntu"
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     # https://hub.docker.com/r/i386/ubuntu/
     container:
@@ -161,17 +170,6 @@ jobs:
           - "-Dusedevel"
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - name: Install System dependencies
         run: |
           apt-get update ||:
@@ -204,24 +202,13 @@ jobs:
     name: "macOS xcode 11"
     runs-on: macos-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
       CONTINUOUS_INTEGRATION: 1
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - uses: actions/checkout@master
         with:
           fetch-depth: 10
@@ -245,24 +232,13 @@ jobs:
     name: "Windows msvc42"
     runs-on: windows-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
       CONTINUOUS_INTEGRATION: 1
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -307,24 +283,13 @@ jobs:
     name: "Windows msvc100"
     runs-on: windows-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
       CONTINUOUS_INTEGRATION: 1
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -355,24 +320,13 @@ jobs:
     name: "Windows mingw64"
     runs-on: windows-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check]
 
     env:
       PERL_SKIP_TTY_TEST: 1
       CONTINUOUS_INTEGRATION: 1
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - uses: actions/checkout@master
         with:
@@ -404,24 +358,13 @@ jobs:
     name: "cygwin"
     runs-on: windows-latest
     timeout-minutes: 120
-    needs: sanity_check
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
       CONTINUOUS_INTEGRATION: 1
 
     steps:
-      # --------------------------------------------------------------------------------------------
-      # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
-        run: |
-          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
-            exit 0
-          fi
-        env:
-          ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
-      # --------------------------------------------------------------------------------------------
       - run: git config --global core.autocrlf false
       - name: Set up Cygwin
         shell: cmd
