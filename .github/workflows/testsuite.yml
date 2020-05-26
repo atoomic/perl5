@@ -19,16 +19,12 @@ jobs:
     # not from a fork and base_ref defined
     if: github.event.pull_request.head.repo.full_name == github.repository && github.base_ref != ''
 
-    env:
-      PERL_SKIP_TTY_TEST: 1
-      CONTINUOUS_INTEGRATION: 1
-
     steps:
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1000
       - name: Involved authors
@@ -36,7 +32,7 @@ jobs:
           echo "Pull request authors"
           echo "# git merge-base origin/${BASE_REF} HEAD"
           branch_off=$(git merge-base origin/${BASE_REF} HEAD)
-          git log --pretty=format:"Author: %an <%ae>" $branch_off..${SHA::8}^2 | sort -u
+          git log --pretty=format:"Author: %an <%ae>" $branch_off..${SHA}^2 | sort -u
         env:
           BASE_REF: ${{ github.base_ref }}
           SHA: ${{ github.sha }}
@@ -83,7 +79,7 @@ jobs:
           TEST_JOBS=2 make -j2 test
 
   check_full_test_suite:
-    name: "Check if ENABLE_FULL_TEST_SUITE set"
+    name: "ENABLE_FULL_TEST_SUITE set?"
     runs-on: ubuntu-latest
     timeout-minutes: 120    
 
