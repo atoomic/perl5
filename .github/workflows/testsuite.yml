@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     # not from a fork and base_ref defined
     if: github.event.pull_request.head.repo.full_name == github.repository && github.base_ref != ''
+    continue-on-error: true
 
     steps:
       - name: Dump GitHub context
@@ -85,6 +86,8 @@ jobs:
   check_full_test_suite:
     name: "ENABLE_FULL_TEST_SUITE set?"
     runs-on: ubuntu-latest
+    # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontinue-on-error
+    continue-on-error: true
 
     steps:
       # --------------------------------------------------------------------------------------------
