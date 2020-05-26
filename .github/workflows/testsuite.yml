@@ -78,10 +78,13 @@ jobs:
         run: |
           TEST_JOBS=2 make -j2 test
 
+  # use a dedicated job to check if full testsuite is enabled
+  # the job fails when ENABLE_FULL_TEST_SUITE is unset
+  # alternatively could upload an artifact file and abort...
+
   check_full_test_suite:
     name: "ENABLE_FULL_TEST_SUITE set?"
     runs-on: ubuntu-latest
-    timeout-minutes: 120    
 
     steps:
       # --------------------------------------------------------------------------------------------
