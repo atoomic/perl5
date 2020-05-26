@@ -80,14 +80,14 @@ jobs:
           TEST_JOBS=2 make -j2 test
 
   # use a dedicated job to check if full testsuite is enabled
+  #   avoid starting VMs if not neeced
+  #   and also provide the same check for all platforms
   # the job fails when ENABLE_FULL_TEST_SUITE is unset
   # alternatively could upload an artifact file and abort...
 
   check_full_test_suite:
     name: "ENABLE_FULL_TEST_SUITE set?"
     runs-on: ubuntu-latest
-    # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idcontinue-on-error
-    continue-on-error: true
 
     steps:
       # --------------------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ jobs:
     name: "Windows mingw64"
     runs-on: windows-latest
     timeout-minutes: 120
-    needs: [sanity_check]
+    needs: [sanity_check, check_full_test_suite]
 
     env:
       PERL_SKIP_TTY_TEST: 1
