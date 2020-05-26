@@ -112,11 +112,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -163,11 +163,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -213,11 +213,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -254,11 +254,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -316,11 +316,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -364,11 +364,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
@@ -413,11 +413,11 @@ jobs:
     steps:
       # --------------------------------------------------------------------------------------------
       # cannot use secrets earlier as part of 'if:' condition
-      - name: "Runs if ENABLE_FULL_TEST_SUITE=1"
+      - name: "Runs if ENABLE_FULL_TEST_SUITE is set"
         run: |
-          if [[ "x${ENABLE_FULL_TEST_SUITE}" != "x1" ]]; then
-            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE == 1. Stopping."
-            exit 78
+          if [ -z "${ENABLE_FULL_TEST_SUITE}" ]; then
+            echo "[Warning] Only run this job when secrets.ENABLE_FULL_TEST_SUITE is set. Stopping."
+            exit 0
           fi
         env:
           ENABLE_FULL_TEST_SUITE: ${{ secrets.ENABLE_FULL_TEST_SUITE }}
