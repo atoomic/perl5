@@ -1,5 +1,6 @@
 package File::GlobMapper;
 
+use p5;
 use strict;
 use warnings;
 use Carp;
@@ -10,13 +11,13 @@ BEGIN
 {
     if ($] < 5.006)
     {
-        require File::BSDGlob; import File::BSDGlob qw(:glob) ;
+        require File::BSDGlob; File::BSDGlob->import( qw(:glob) );
         $CSH_GLOB = File::BSDGlob::GLOB_CSH() ;
         *globber = \&File::BSDGlob::csh_glob;
     }
     else
     {
-        require File::Glob; import File::Glob qw(:glob) ;
+        require File::Glob; File::Glob->import( qw(:glob) );
         $CSH_GLOB = File::Glob::GLOB_CSH() ;
         #*globber = \&File::Glob::bsd_glob;
         *globber = \&File::Glob::csh_glob;
@@ -51,7 +52,7 @@ sub globmap ($$;)
     my $inputGlob = shift ;
     my $outputGlob = shift ;
 
-    my $obj = new File::GlobMapper($inputGlob, $outputGlob, @_)
+    my $obj = File::GlobMapper->new($inputGlob, $outputGlob, @_)
         or croak "globmap: $Error" ;
     return $obj->getFileMap();
 }
@@ -383,7 +384,7 @@ File::GlobMapper - Extend File Glob to Allow Input and Output Files
     my $aref = globmap $input => $output
         or die $File::GlobMapper::Error ;
 
-    my $gm = new File::GlobMapper $input => $output
+    my $gm = File::GlobMapper->new( $input => $output )
         or die $File::GlobMapper::Error ;
 
 

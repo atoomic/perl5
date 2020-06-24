@@ -10,6 +10,7 @@ BEGIN {
     set_up_inc('../lib');
 }
 
+use p5;
 use warnings;
 
 plan(tests => 284);
@@ -674,7 +675,9 @@ is join(' ', sub {
 # the non-existence of a function, should not cause a stash entry to be
 # created for the non-existent function.
 {
-	package RT72740a;
+    package RT72740a;
+    use feature 'indirect';
+
 	my $f = bless({}, RT72740b);
 	sub s1 { s2 $f; }
 	our $s4;
@@ -1059,12 +1062,15 @@ package lrcg {
 }
 
 is runperl(prog => '$s = STDERR; close $s; undef *$s;'
-                  .'eval q-*STDERR if 0-; *$s = *STDOUT{IO}; warn'),
+                  .'eval q-*STDERR if 0-; *$s = *STDOUT{IO}; warn',
+           run_as_five => 1,
+    ),
   "Warning: something's wrong at -e line 1.\n",
   "try_downgrade does not touch PL_stderrgv";
 
 is runperl(prog =>
              'use constant foo=>1; BEGIN { $x = \&foo } undef &$x; $x->()',
+           run_as_five => 1,
            stderr=>1),
   "Undefined subroutine &main::foo called at -e line 1.\n",
   "gv_try_downgrade does not anonymise CVs referenced elsewhere";

@@ -19,6 +19,16 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
+BEGIN {
+    local @INC = qw( ./lib ../lib ../../lib );
+    require p5;
+    p5->import;
+}
+
+BEGIN {
+    $ENV{PERL5LIB} = join(':', @INC );
+}
+
 $| = 1;
 $Level = 1;
 my $test = 1;
@@ -649,6 +659,9 @@ sub _create_runperl { # Create the string to qx in runperl().
     if ($runperl =~ m/\s/) {
         $runperl = qq{"$runperl"};
     }
+
+    my $dash_e = $args{run_as_five} ? q[-5] : q[-e];
+
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if ($ENV{PERL_RUNPERL_DEBUG}) {
 	$runperl = "$ENV{PERL_RUNPERL_DEBUG} $runperl";
@@ -683,10 +696,10 @@ sub _create_runperl { # Create the string to qx in runperl().
 		}
 	    }
             if ($is_mswin || $is_netware || $is_vms) {
-                $runperl = $runperl . qq ( -e "$prog" );
+                $runperl = $runperl . qq ( $dash_e "$prog" );
             }
             else {
-                $runperl = $runperl . qq ( -e '$prog' );
+                $runperl = $runperl . qq ( $dash_e '$prog' );
             }
         }
     } elsif (defined $args{progfile}) {
@@ -705,11 +718,11 @@ sub _create_runperl { # Create the string to qx in runperl().
 	$args{stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
-	    $runperl = qq{$Perl -e "print qq(} .
+	    $runperl = qq{$Perl $dash_e "print qq(} .
 		$args{stdin} . q{)" | } . $runperl;
 	}
 	else {
-	    $runperl = qq{$Perl -e 'print qq(} .
+	    $runperl = qq{$Perl $dash_e 'print qq(} .
 		$args{stdin} . q{)' | } . $runperl;
 	}
     } elsif (exists $args{stdin}) {
@@ -794,9 +807,8 @@ sub runperl {
 	}
 	$runperl =~ /(.*)/s;
 	$runperl = $1;
-
 	$result = `$runperl`;
-    } else {
+    } else {        
 	$result = `$runperl`;
     }
     $result =~ s/\n\n/\n/g if $is_vms; # XXX pipes sometimes double these
@@ -986,6 +998,7 @@ sub fresh_perl {
 
     open TEST, '>', $tmpfile or die "Cannot open $tmpfile: $!";
     binmode TEST, ':utf8' if $runperl_args->{wide_chars};
+    print TEST qq[use p5; ] if $runperl_args->{run_as_five}; # no newline to avoid offset
     print TEST $prog;
     close TEST or die "Cannot close $tmpfile: $!";
 
@@ -1278,6 +1291,7 @@ sub run_multiple_progs {
 	print $fh $prog,"\n";
 	close $fh or die "Cannot close $tmpfile: $!";
 	my $results = runperl( stderr => 1, progfile => $tmpfile,
+                   #run_as_five => 1,
 			       stdin => undef, $up
 			       ? (switches => ["-I$up/lib", $switch], nolib => 1)
 			       : (switches => [$switch])
@@ -1380,7 +1394,7 @@ sub run_multiple_progs {
 	    unlink $_ if $_;
 	}
 	foreach (@temp_path) {
-	    File::Path::rmtree $_ if -d $_;
+	    File::Path::rmtree($_) if -d $_;
 	}
     }
 }

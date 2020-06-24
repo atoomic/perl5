@@ -1,4 +1,5 @@
 package CPAN::Shell;
+use p5;
 use strict;
 
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
@@ -712,7 +713,7 @@ sub recompile {
         $pack->install;
         $CPAN::Signal = 0; # it's tempting to reset Signal, so we can
                            # stop a package from recompiling,
-                           # e.g. IO-1.12 when we have perl5.003_10
+                           # e.g. IO-1.12 when we have perl7.003_10
     }
 }
 

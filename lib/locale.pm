@@ -1,8 +1,9 @@
 package locale;
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 use Config;
 
+no warnings 'once';
 $Carp::Internal{ (__PACKAGE__) } = 1;
 
 =head1 NAME
@@ -70,7 +71,7 @@ sub import {
                               :numeric :monetary :time) );
         for (my $i = 0; $i < @_; $i++) {
             my $arg = $_[$i];
-            $complement = $arg =~ s/ : ( ! | not_ ) /:/x;
+            my $complement = $arg =~ s/ : ( ! | not_ ) /:/x;
             if (! grep { $arg eq $_ } @categories, ":characters") {
                 require Carp;
                 Carp::croak("Unknown parameter '$_[$i]' to 'use locale'");
@@ -107,7 +108,7 @@ sub import {
 
             $arg =~ s/^://;
 
-            eval { require POSIX; import POSIX 'locale_h'; };
+            eval { require POSIX; POSIX->import('locale_h'); };
 
             # Map our names to the ones defined by POSIX
             my $LC = "LC_" . uc($arg);

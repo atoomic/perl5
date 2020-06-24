@@ -15,6 +15,7 @@ BEGIN {
 }
 
 use strict;
+no warnings;
 
 my $Perl = which_perl();
 
@@ -52,7 +53,7 @@ foreach my $prog (@prgs) {
 
     $expected =~ s/\n+$//;
 
-    fresh_perl_is($prog, $expected, { switches => [$switch || ''] }, $name);
+    fresh_perl_is($prog, $expected, { switches => [$switch || ''], run_as_five => 1 }, $name);
 }
 
 __END__
@@ -99,7 +100,7 @@ chop($file = <DATA>);
 ########
 package N;
 sub new {my ($obj,$n)=@_; bless \$n}  
-$aa=new N 1;
+$aa=N->new(1);
 $aa=12345;
 print $aa;
 EXPECT
@@ -126,7 +127,7 @@ Modification of a read-only value attempted at - line 3.
 package FOO;sub new {bless {FOO => BAR}};
 package main;
 use strict vars;   
-my $self = new FOO;
+my $self = FOO->new;
 print $$self{FOO};
 EXPECT
 BAR
@@ -326,6 +327,7 @@ EXPECT
 inner peace
 ########
 -w
+use warnings;
 $| = 1;
 sub foo {
     print "In foo1\n";
@@ -388,7 +390,7 @@ package X;
 sub ascalar { my $r; bless \$r }
 sub DESTROY { print "destroyed\n" };
 package main;
-*s = ascalar X;
+*s = X->ascalar;
 EXPECT
 destroyed
 ########
@@ -396,7 +398,7 @@ package X;
 sub anarray { bless [] }
 sub DESTROY { print "destroyed\n" };
 package main;
-*a = anarray X;
+*a = X->anarray;
 EXPECT
 destroyed
 ########
@@ -404,7 +406,7 @@ package X;
 sub ahash { bless {} }
 sub DESTROY { print "destroyed\n" };
 package main;
-*h = ahash X;
+*h = X->ahash;
 EXPECT
 destroyed
 ########
@@ -412,7 +414,7 @@ package X;
 sub aclosure { my $x; bless sub { ++$x } }
 sub DESTROY { print "destroyed\n" };
 package main;
-*c = aclosure X;
+*c = X->aclosure;
 EXPECT
 destroyed
 ########
@@ -422,8 +424,8 @@ my $f = "FH000"; # just to thwart any future optimisations
 sub afh { select select ++$f; my $r = *{$f}{IO}; delete $X::{$f}; bless $r }
 sub DESTROY { print "destroyed\n" }
 package main;
-$x = any X; # to bump sv_objcount. IO objs aren't counted??
-*f = afh X;
+$x = X->any; # to bump sv_objcount. IO objs aren't counted??
+*f = X->afh;
 EXPECT
 destroyed
 destroyed
@@ -504,12 +506,13 @@ EXPECT
 ZZZ
 ########
 -w
+use warnings;
 if (@ARGV) { print "" }
 else {
   if ($x == 0) { print "" } else { print $x }
 }
 EXPECT
-Use of uninitialized value $x in numeric eq (==) at - line 3.
+Use of uninitialized value $x in numeric eq (==) at - line 4.
 ########
 $x = sub {};
 foo();
@@ -730,6 +733,7 @@ $eval = eval 'sub { eval "sub { %S }" }';
 $eval->({});
 ######## [perl #17951] Strange UTF error
 -W
+no warnings;
 # From: "John Kodis" <kodis@mail630.gsfc.nasa.gov>
 # Newsgroups: comp.lang.perl.moderated
 # Subject: Strange UTF error
@@ -738,7 +742,7 @@ $eval->({});
 $_ = "foobar\n";
 utf8::upgrade($_); # the original code used a UTF-8 locale (affects STDIN)
 # matching is actually irrelevant: avoiding several dozen of these
-# Illegal hexadecimal digit '	' ignored at /usr/lib/perl5/5.8.0/utf8_heavy.pl line 152
+# Illegal hexadecimal digit '	' ignored at /usr/lib/perl7/5.8.0/utf8_heavy.pl line 152
 # is what matters.
 /^([[:digit:]]+)/;
 EXPECT
@@ -794,7 +798,7 @@ EOC
 };
 
 eval {
-    my $credit = new Credit;
+    my $credit = Credit->new;
 };
 
 print "If you get here, you didn't crash\n";

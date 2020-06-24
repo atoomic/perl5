@@ -1,5 +1,14 @@
 #!./perl
 
+BEGIN {
+    chdir 't' if -d 't';
+    unshift( @INC, '../lib' );
+}
+
+no strict;
+no warnings;
+no feature 'signatures';
+
 print "1..120\n";
 
 $x = 'x';

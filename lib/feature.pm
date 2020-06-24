@@ -5,7 +5,9 @@
 
 package feature;
 
-our $VERSION = '1.58';
+use p5;
+
+our $VERSION = '1.59';
 
 our %feature = (
     fc              => 'feature_fc',
@@ -27,17 +29,14 @@ our %feature = (
 
 our %feature_bundle = (
     "5.10"    => [qw(indirect say state switch)],
-    "5.11"    => [qw(indirect say state switch unicode_strings)],
     "5.15"    => [qw(current_sub evalbytes fc indirect say state switch unicode_eval unicode_strings)],
     "5.23"    => [qw(current_sub evalbytes fc indirect postderef_qq say state switch unicode_eval unicode_strings)],
     "5.27"    => [qw(bitwise current_sub evalbytes fc indirect postderef_qq say state switch unicode_eval unicode_strings)],
+    "7.0"     => [qw(bitwise current_sub declared_refs evalbytes fc indirect isa postderef_qq refaliasing say signatures state switch unicode_eval)],
     "all"     => [qw(bitwise current_sub declared_refs evalbytes fc indirect isa postderef_qq refaliasing say signatures state switch unicode_eval unicode_strings)],
-    "default" => [qw(indirect)],
+    "default" => [qw()],
 );
 
-$feature_bundle{"5.12"} = $feature_bundle{"5.11"};
-$feature_bundle{"5.13"} = $feature_bundle{"5.11"};
-$feature_bundle{"5.14"} = $feature_bundle{"5.11"};
 $feature_bundle{"5.16"} = $feature_bundle{"5.15"};
 $feature_bundle{"5.17"} = $feature_bundle{"5.15"};
 $feature_bundle{"5.18"} = $feature_bundle{"5.15"};
@@ -53,7 +52,6 @@ $feature_bundle{"5.29"} = $feature_bundle{"5.27"};
 $feature_bundle{"5.30"} = $feature_bundle{"5.27"};
 $feature_bundle{"5.31"} = $feature_bundle{"5.27"};
 $feature_bundle{"5.32"} = $feature_bundle{"5.27"};
-$feature_bundle{"5.9.5"} = $feature_bundle{"5.10"};
 my %noops = (
     postderef => 1,
     lexical_subs => 1,
@@ -64,7 +62,7 @@ my %removed = (
 
 our $hint_shift   = 26;
 our $hint_mask    = 0x1c000000;
-our @hint_bundles = qw( default 5.10 5.11 5.15 5.23 5.27 );
+our @hint_bundles = qw( default 5.10 5.15 5.23 5.27 7.0 );
 
 # This gets set (for now) in $^H as well as in %^H,
 # for runtime speed of the uc/lc/ucfirst/lcfirst functions.
@@ -384,13 +382,9 @@ The following feature bundles are available:
 
   bundle    features included
   --------- -----------------
-  :default  indirect
+  :default
 
   :5.10     say state switch indirect
-
-  :5.12     say state switch unicode_strings indirect
-
-  :5.14     say state switch unicode_strings indirect
 
   :5.16     say state switch unicode_strings
             unicode_eval evalbytes current_sub fc

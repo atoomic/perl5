@@ -2,9 +2,13 @@
 # $Id: Encode.pm,v 3.06 2020/05/02 02:31:14 dankogai Exp $
 #
 package Encode;
+use p5;
 use strict;
 use warnings;
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
+
+no warnings 'redefine';
+
 our $VERSION;
 BEGIN {
     $VERSION = sprintf "%d.%02d", q$Revision: 3.06 $ =~ /(\d+)/g;

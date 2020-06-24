@@ -20,7 +20,7 @@
 #include <patchlevel.h>		/* Perl's one, needed since 5.6 */
 #endif
 
-#if !defined(PERL_VERSION) || PERL_VERSION < 10 || (PERL_VERSION == 10 && PERL_SUBVERSION < 1)
+#if !defined(PERL_VERSION) || PERL_REVISION == 5 && ( PERL_VERSION < 10 || (PERL_VERSION == 10 && PERL_SUBVERSION < 1))
 #define NEED_PL_parser
 #define NEED_sv_2pv_flags
 #define NEED_load_module
@@ -524,11 +524,11 @@ static MAGIC *THX_sv_magicext(pTHX_
 #if (PATCHLEVEL <= 4) && (SUBVERSION < 68)
 #define dSTCXT_SV                                               \
     SV *perinterp_sv = get_sv(MY_VERSION, 0)
-#else	/* >= perl5.004_68 */
+#else	/* >= perl7.004_68 */
 #define dSTCXT_SV						\
     SV *perinterp_sv = *hv_fetch(PL_modglobal,                  \
 				 MY_VERSION, sizeof(MY_VERSION)-1, TRUE)
-#endif	/* < perl5.004_68 */
+#endif	/* < perl7.004_68 */
 
 #define dSTCXT_PTR(T,name)					\
     T name = ((perinterp_sv                                     \
@@ -1635,13 +1635,13 @@ static void init_store_context(pTHX_
     HvSHAREKEYS_off(cxt->hseen);
 #endif
     /*
-     * The following does not work well with perl5.004_04, and causes
+     * The following does not work well with perl7.004_04, and causes
      * a core dump later on, in a completely unrelated spot, which
      * makes me think there is a memory corruption going on.
      *
      * Calling hv_ksplit(hseen, HBUCKETS) instead of manually hacking
      * it below does not make any difference. It seems to work fine
-     * with perl5.004_68 but given the probable nature of the bug,
+     * with perl7.004_68 but given the probable nature of the bug,
      * that does not prove anything.
      *
      * It's a shame because increasing the amount of buckets raises
@@ -1650,7 +1650,7 @@ static void init_store_context(pTHX_
      *
      * It is reported fixed in 5.005, hence the #if.
      */
-#if PERL_VERSION >= 5
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 5)
 #define HBUCKETS	4096		/* Buckets for %hseen */
 #ifndef USE_PTR_TABLE
     HvMAX(cxt->hseen) = HBUCKETS - 1;	/* keys %hseen = $HBUCKETS; */
@@ -1667,7 +1667,7 @@ static void init_store_context(pTHX_
 
     cxt->hclass = newHV();		/* Where seen classnames are stored */
 
-#if PERL_VERSION >= 5
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 5)
     HvMAX(cxt->hclass) = HBUCKETS - 1;	/* keys %hclass = $HBUCKETS; */
 #endif
 
@@ -2244,7 +2244,7 @@ static AV *array_call(pTHX_
     return av;
 }
 
-#if PERL_VERSION < 15
+#if PERL_REVISION == 5 && PERL_VERSION < 15
 static void
 cleanup_recursive_av(pTHX_ AV* av) {
     SSize_t i = AvFILLp(av);
@@ -2252,7 +2252,7 @@ cleanup_recursive_av(pTHX_ AV* av) {
     if (SvMAGICAL(av)) return;
     while (i >= 0) {
         if (arr[i]) {
-#if PERL_VERSION < 14
+#if PERL_REVISION == 5 && PERL_VERSION < 14
             arr[i] = NULL;
 #else
             SvREFCNT_dec(arr[i]);
@@ -2283,7 +2283,7 @@ cleanup_recursive_hv(pTHX_ HV* hv) {
         }
         i--;
     }
-#if PERL_VERSION < 8
+#if PERL_REVISION == 5 && PERL_VERSION < 8
     ((XPVHV*)SvANY(hv))->xhv_array = NULL;
 #else
     HvARRAY(hv) = NULL;
@@ -2394,7 +2394,7 @@ static int store_ref(pTHX_ stcxt_t *cxt, SV *sv)
     TRACEME((">ref recur_depth %" IVdf ", recur_sv (0x%" UVxf ") max %" IVdf, cxt->recur_depth,
              PTR2UV(cxt->recur_sv), cxt->max_recur_depth));
     if (RECURSION_TOO_DEEP()) {
-#if PERL_VERSION < 15
+#if PERL_REVISION == 5 && PERL_VERSION < 15
         cleanup_recursive_data(aTHX_ (SV*)sv);
 #endif
         CROAK((MAX_DEPTH_ERROR));
@@ -2699,7 +2699,7 @@ static int store_array(pTHX_ stcxt_t *cxt, AV *av)
     if (recur_sv != (SV*)av) {
         if (RECURSION_TOO_DEEP()) {
             /* with <= 5.14 it recurses in the cleanup also, needing 2x stack size */
-#if PERL_VERSION < 15
+#if PERL_REVISION == 5 && PERL_VERSION < 15
             cleanup_recursive_data(aTHX_ (SV*)av);
 #endif
             CROAK((MAX_DEPTH_ERROR));
@@ -2819,7 +2819,7 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
          * Large hash: SX_LOBJECT type hashflags? U64 data
          *
          * Stupid limitation:
-         * Note that perl5 can store more than 2G keys, but only iterate
+         * Note that perl7 can store more than 2G keys, but only iterate
          * over 2G max. (cperl can)
          * We need to manually iterate over it then, unsorted.
          * But until perl itself cannot do that, skip that.
@@ -2861,7 +2861,7 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
         ++cxt->recur_depth;
     }
     if (RECURSION_TOO_DEEP_HASH()) {
-#if PERL_VERSION < 15
+#if PERL_REVISION == 5 && PERL_VERSION < 15
         cleanup_recursive_data(aTHX_ (SV*)hv);
 #endif
         CROAK((MAX_DEPTH_ERROR));
@@ -3243,7 +3243,7 @@ static int store_hentry(pTHX_
  * store_lhash
  *
  * Store a overlong hash table, with >2G keys, which we cannot iterate
- * over with perl5. xhv_eiter is only I32 there. (only cperl can)
+ * over with perl7. xhv_eiter is only I32 there. (only cperl can)
  * and we also do not want to sort it.
  * So we walk the buckets and chains manually.
  *
@@ -3275,7 +3275,7 @@ static int store_lhash(pTHX_ stcxt_t *cxt, HV *hv, unsigned char hash_flags)
         ++cxt->recur_depth;
     }
     if (RECURSION_TOO_DEEP_HASH()) {
-#if PERL_VERSION < 15
+#if PERL_REVISION == 5 && PERL_VERSION < 15
         cleanup_recursive_data(aTHX_ (SV*)hv);
 #endif
         CROAK((MAX_DEPTH_ERROR));
@@ -3311,7 +3311,7 @@ static int store_lhash(pTHX_ stcxt_t *cxt, HV *hv, unsigned char hash_flags)
  */
 static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 {
-#if PERL_VERSION < 6
+#if PERL_REVISION == 5 && PERL_VERSION < 6
     /*
      * retrieve_code does not work with perl 5.005 or less
      */
@@ -3410,10 +3410,10 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 #endif
 }
 
-#if PERL_VERSION < 8
+#if PERL_REVISION == 5 && PERL_VERSION < 8
 #   define PERL_MAGIC_qr                  'r' /* precompiled qr// regex */
 #   define BFD_Svs_SMG_OR_RMG SVs_RMG
-#elif ((PERL_VERSION==8) && (PERL_SUBVERSION >= 1) || (PERL_VERSION>8))
+#elif PERL_REVISION > 5 || (PERL_REVISION == 5 && ((PERL_VERSION==8) && (PERL_SUBVERSION >= 1) || (PERL_VERSION>8)))
 #   define BFD_Svs_SMG_OR_RMG SVs_SMG
 #   define MY_PLACEHOLDER PL_sv_placeholder
 #else
@@ -3424,7 +3424,7 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 static int get_regexp(pTHX_ stcxt_t *cxt, SV* sv, SV **re, SV **flags) {
     dSP;
     SV* rv;
-#if PERL_VERSION >= 12
+#if PERL_REVISION == 5 && PERL_VERSION >= 12
     CV *cv = get_cv("re::regexp_pattern", 0);
 #else
     CV *cv = get_cv("Storable::_regexp_pattern", 0);
@@ -4286,7 +4286,7 @@ static int sv_type(pTHX_ SV *sv)
 {
     switch (SvTYPE(sv)) {
     case SVt_NULL:
-#if PERL_VERSION <= 10
+#if PERL_REVISION == 5 && PERL_VERSION <= 10
     case SVt_IV:
 #endif
     case SVt_NV:
@@ -4296,7 +4296,7 @@ static int sv_type(pTHX_ SV *sv)
          */
         return svis_SCALAR;
     case SVt_PV:
-#if PERL_VERSION <= 10
+#if PERL_REVISION == 5 && PERL_VERSION <= 10
     case SVt_RV:
 #else
     case SVt_IV:
@@ -4314,20 +4314,20 @@ static int sv_type(pTHX_ SV *sv)
          */
         return SvROK(sv) ? svis_REF : svis_SCALAR;
     case SVt_PVMG:
-#if PERL_VERSION <= 10
+#if PERL_REVISION == 5 && PERL_VERSION <= 10
         if ((SvFLAGS(sv) & (SVs_OBJECT|SVf_OK|SVs_GMG|SVs_SMG|SVs_RMG))
 	          == (SVs_OBJECT|BFD_Svs_SMG_OR_RMG)
 	    && mg_find(sv, PERL_MAGIC_qr)) {
 	      return svis_REGEXP;
 	}
 #endif
-    case SVt_PVLV:		/* Workaround for perl5.004_04 "LVALUE" bug */
+    case SVt_PVLV:		/* Workaround for perl7.004_04 "LVALUE" bug */
         if ((SvFLAGS(sv) & (SVs_GMG|SVs_SMG|SVs_RMG)) ==
             (SVs_GMG|SVs_SMG|SVs_RMG) &&
             (mg_find(sv, 'p')))
             return svis_TIED_ITEM;
         /* FALL THROUGH */
-#if PERL_VERSION < 9
+#if PERL_REVISION == 5 && PERL_VERSION < 9
     case SVt_PVBM:
 #endif
         if ((SvFLAGS(sv) & (SVs_GMG|SVs_SMG|SVs_RMG)) ==
@@ -4345,10 +4345,10 @@ static int sv_type(pTHX_ SV *sv)
         return svis_HASH;
     case SVt_PVCV:
         return svis_CODE;
-#if PERL_VERSION > 8
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION > 8)
 	/* case SVt_INVLIST: */
 #endif
-#if PERL_VERSION > 10
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION > 10)
     case SVt_REGEXP:
         return svis_REGEXP;
 #endif
@@ -6689,7 +6689,7 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
  */
 static SV *retrieve_code(pTHX_ stcxt_t *cxt, const char *cname)
 {
-#if PERL_VERSION < 6
+#if PERL_REVISION == 5 && PERL_VERSION < 6
     CROAK(("retrieve_code does not work with perl 5.005 or less\n"));
 #else
     dSP;
@@ -6817,7 +6817,7 @@ static SV *retrieve_code(pTHX_ stcxt_t *cxt, const char *cname)
 }
 
 static SV *retrieve_regexp(pTHX_ stcxt_t *cxt, const char *cname) {
-#if PERL_VERSION >= 8
+#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 8)
     int op_flags;
     U32 re_len;
     STRLEN flags_len;
@@ -7712,7 +7712,7 @@ static SV *dclone(pTHX_ SV *sv)
      */
 
     if ((SvTYPE(sv) == SVt_PVLV
-#if PERL_VERSION < 8
+#if PERL_REVISION == 5 && PERL_VERSION < 8
          || SvTYPE(sv) == SVt_PVMG
 #endif
          ) && (SvFLAGS(sv) & (SVs_GMG|SVs_SMG|SVs_RMG)) ==

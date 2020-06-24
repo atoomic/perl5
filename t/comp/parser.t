@@ -3,12 +3,23 @@
 # Checks if the parser behaves correctly in edge cases
 # (including weird syntax errors)
 
+# use p5; # without loading p5 itself...
+BEGIN {
+    ${^WARNING_BITS} = 0;
+    $^W = 0;
+
+    $^H = 0x0;
+    %^H = ();
+}
+
 BEGIN {
     @INC = qw(. ../lib);
     chdir 't' if -d 't';
 }
 
 print "1..188\n";
+
+our $test;
 
 sub failed {
     my ($got, $expected, $name) = @_;
@@ -499,8 +510,8 @@ eval 'for my a1b $i (1) {}';
 # ng: 'Missing $ on loop variable'
 like $@, "^No such class a1b at ", 'TYPE of my of for statement';
 
-eval 'method {} {$_,undef}';
-like $@, qq/^Can't call method "method" on unblessed reference at /,
+eval '{use method {} {$_,undef}';
+like $@, qq/^syntax error/,
      'method BLOCK {...} does not try to disambiguate';
 
 eval '#line 1 maggapom

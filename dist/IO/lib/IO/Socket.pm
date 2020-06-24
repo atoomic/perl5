@@ -7,6 +7,7 @@
 
 package IO::Socket;
 
+use p5;
 use 5.008_001;
 
 use IO::Handle;
@@ -120,7 +121,7 @@ sub connect {
 	if (defined $timeout && ($!{EINPROGRESS} || $!{EWOULDBLOCK})) {
 	    require IO::Select;
 
-	    my $sel = new IO::Select $sock;
+	    my $sel = IO::Select->new( $sock );
 
 	    undef $!;
 	    my($r,$w,$e) = IO::Select::select(undef,$sel,$sel,$timeout);
@@ -177,7 +178,7 @@ sub blocking {
 
     # Windows handles blocking differently
     #
-    # http://groups.google.co.uk/group/perl.perl5.porters/browse_thread/thread/b4e2b1d88280ddff/630b667a66e3509f?#630b667a66e3509f
+    # http://groups.google.co.uk/group/perl.perl7.porters/browse_thread/thread/b4e2b1d88280ddff/630b667a66e3509f?#630b667a66e3509f
     # http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/winsock/ioctlsocket_2.asp
     #
     # 0x8004667e is FIONBIO
@@ -243,7 +244,7 @@ sub accept {
     if(defined $timeout) {
 	require IO::Select;
 
-	my $sel = new IO::Select $sock;
+	my $sel = IO::Select->new( $sock );
 
 	unless ($sel->can_read($timeout)) {
 	    $@ = 'accept: timeout';

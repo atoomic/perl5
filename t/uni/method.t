@@ -15,6 +15,8 @@ use utf8;
 use open qw( :utf8 :std );
 no warnings 'once';
 
+use feature 'indirect';
+
 plan(tests => 62);
 
 #Can't use bless yet, as it might not be clean
@@ -74,7 +76,7 @@ is(do { use utf8; use open qw( :utf8 :std ); eval 'Ｆｏｏ->ｂｏｏｇｉｅ
 SKIP: {
     skip_if_miniperl('no dynamic loading on miniperl, no Encode');
 
-    my $prog = q!use utf8; use open qw( :utf8 :std ); sub Ｔ::DESTROY { $x = $_[0]; } bless [], "Ｔ";!;
+    my $prog = q!use utf8; use open qw( :utf8 :std ); our $x; sub Ｔ::DESTROY { $x = $_[0]; } bless [], "Ｔ";!;
     utf8::decode($prog);
 
     my $tmpfile = tempfile();

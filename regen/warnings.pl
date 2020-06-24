@@ -16,7 +16,7 @@
 #
 # This script is normally invoked from regen.pl.
 
-$VERSION = '1.47';
+our $VERSION = '1.47';
 
 BEGIN {
     require './regen/regen_lib.pl';
@@ -92,8 +92,6 @@ my $tree = {
                                 'experimental::smartmatch' =>
                                     [ 5.017, DEFAULT_ON ],
                                 'experimental::postderef' =>
-                                    [ 5.019, DEFAULT_ON ],
-                                'experimental::signatures' =>
                                     [ 5.019, DEFAULT_ON ],
                                 'experimental::win32_perlio' =>
                                     [ 5.021, DEFAULT_ON ],
@@ -670,6 +668,11 @@ sub import
     ${^WARNING_BITS} = _bits($mask, @_);
 }
 
+my %removedWarningsFor = (
+    'FATAL'                    => 1,
+    'experimental::signatures' => 1,
+);
+
 sub unimport
 {
     shift;
@@ -682,7 +685,7 @@ sub unimport
 
     $mask = _expand_bits($mask);
     foreach my $word ( @_ ) {
-	if ($word eq 'FATAL') {
+	if ($removedWarningsFor{$word}) {
 	    next;
 	}
 	elsif ($catmask = $Bits{$word}) {
@@ -1171,7 +1174,7 @@ warnings, such unanticipated exceptions could also expose memory leak bugs.
 Moreover, the Perl interpreter itself has had serious bugs involving
 fatalized warnings.  For a summary of resolved and unresolved problems as
 of January 2015, please see
-L<this perl5-porters post|http://www.nntp.perl.org/group/perl.perl5.porters/2015/01/msg225235.html>.
+L<this perl7-porters post|http://www.nntp.perl.org/group/perl.perl7.porters/2015/01/msg225235.html>.
 
 While some developers find fatalizing some warnings to be a useful
 defensive programming technique, using C<< FATAL => 'all' >> to fatalize
@@ -1201,7 +1204,7 @@ and spirit.  Use of such features in combination with FATAL warnings is
 ENTIRELY AT THE USER'S RISK.
 
 The following documentation describes how to use FATAL warnings but the
-perl5 porters strongly recommend that you understand the risks before doing
+perl7 porters strongly recommend that you understand the risks before doing
 so, especially for library code intended for use by others, as there is no
 way for downstream users to change the choice of fatal categories.
 

@@ -1,5 +1,6 @@
 package Safe;
 
+use p5;
 use 5.003_11;
 use Scalar::Util qw(reftype refaddr);
 
@@ -812,7 +813,7 @@ Originally designed and implemented by Malcolm Beattie.
 
 Reworked to use the Opcode module and other changes added by Tim Bunce.
 
-Currently maintained by the Perl 5 Porters, <perl5-porters@perl.org>.
+Currently maintained by the Perl 5 Porters, <perl7-porters@perl.org>.
 
 =cut
 

@@ -9,6 +9,15 @@
 # we should test as many as we can.
 #
 
+# use p5; # without loading p5 itself...
+BEGIN {
+    ${^WARNING_BITS} = 0;
+    $^W = 0;
+
+    $^H = 0x0;
+    %^H = ();
+}
+
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';

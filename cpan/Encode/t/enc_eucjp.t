@@ -1,8 +1,9 @@
 # $Id: enc_eucjp.t,v 2.6 2019/01/31 04:26:40 dankogai Exp $
 # This is the twin of enc_utf8.t .
 
+our %Config;
 BEGIN {
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;

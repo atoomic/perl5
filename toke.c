@@ -38,6 +38,7 @@ Individual members of C<PL_parser> have their own documentation.
 #include "EXTERN.h"
 #define PERL_IN_TOKE_C
 #include "perl.h"
+#include "perl7.h"
 #include "invlist_inline.h"
 
 #define new_constant(a,b,c,d,e,f,g, h)	\
@@ -8696,7 +8697,7 @@ yyl_try(pTHX_ char *s)
 	    if (PL_perldb) {
 		/* Generate a string of Perl code to load the debugger.
 		 * If PERL5DB is set, it will return the contents of that,
-		 * otherwise a compile-time require of perl5db.pl.  */
+		 * otherwise a compile-time require of perl7db.pl.  */
 
 		const char * const pdb = PerlEnv_getenv("PERL5DB");
 
@@ -8705,7 +8706,7 @@ yyl_try(pTHX_ char *s)
 		    sv_catpvs(PL_linestr,";");
 		} else {
 		    SETERRNO(0,SS_NORMAL);
-		    sv_setpvs(PL_linestr, "BEGIN { require 'perl5db.pl' };");
+		    sv_setpvs(PL_linestr, "BEGIN { require 'perl7db.pl' };");
 		}
 		PL_parser->preambling = CopLINE(PL_curcop);
 	    } else
@@ -8723,8 +8724,13 @@ yyl_try(pTHX_ char *s)
 	    }
 	    if (PL_minus_E)
 		sv_catpvs(PL_linestr,
-			  "use feature ':5." STRINGIFY(PERL_VERSION) "';");
-	    if (PL_minus_n || PL_minus_p) {
+			  "use feature ':" STRINGIFY(PERL_REVISION) "." STRINGIFY(PERL_VERSION) "';");
+
+        if (!PL_minus_5) /* by default load p7 feature */
+            sv_catpvs(PL_linestr, P7_TOKE_SETUP); /* try avoiding loading a module... */
+        /* no need to load p5 when PL_minus_5 is set... this is already the defaults */
+
+        if (PL_minus_n || PL_minus_p) {
 		sv_catpvs(PL_linestr, "LINE: while (<>) {"/*}*/);
 		if (PL_minus_l)
 		    sv_catpvs(PL_linestr,"chomp;");

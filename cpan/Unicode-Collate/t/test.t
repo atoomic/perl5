@@ -18,7 +18,7 @@ use strict;
 use warnings;
 BEGIN { $| = 1; print "1..96\n"; }
 my $count = 0;
-sub ok ($;$) {
+sub ok :prototype($;$) {
     my $p = my $r = shift;
     if (@_) {
 	my $x = shift;
@@ -304,11 +304,11 @@ $_ = 'Foo';
 ok($_, 'Foo');
 
 $_ = 'Foo';
-@temp = $c->index("perl5", "RL");
+@temp = $c->index("perl7", "RL");
 ok($_, 'Foo');
 
 $_ = 'Foo';
-@temp = $c->index("perl5", "LR");
+@temp = $c->index("perl7", "LR");
 ok($_, 'Foo');
 
 # 91

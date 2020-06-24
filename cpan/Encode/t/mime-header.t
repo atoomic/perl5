@@ -2,12 +2,15 @@
 # $Id: mime-header.t,v 2.15 2017/07/18 07:15:29 dankogai Exp $
 # This script is written in utf8
 #
+our %Config;
 BEGIN {
-    if ($ENV{'PERL_CORE'}){
+    if ($ENV{'PERL_CORE'}) {
         chdir 't';
-        unshift @INC, '../lib';
+        my $lib = $^X;
+        $lib =~ s{(\b)perl[^/]*$}{$1lib};
+        unshift @INC, $lib;
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($Config{'extensions'} !~ /\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;

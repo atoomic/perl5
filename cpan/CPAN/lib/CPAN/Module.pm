@@ -1,6 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 # vim: ts=4 sts=4 sw=4:
 package CPAN::Module;
+use p5;
 use strict;
 @CPAN::Module::ISA = qw(CPAN::InfoObj);
 
@@ -607,12 +608,12 @@ sub available_file {
     my $perllib = $ENV{PERL5LIB};
     $perllib = $ENV{PERLLIB} unless defined $perllib;
     my @perllib = split(/$sep/,$perllib) if defined $perllib;
-    my @cpan_perl5inc;
+    my @cpan_perl7inc;
     if ($CPAN::Perl5lib_tempfile) {
         my $yaml = CPAN->_yaml_loadfile($CPAN::Perl5lib_tempfile);
-        @cpan_perl5inc = @{$yaml->[0]{inc} || []};
+        @cpan_perl7inc = @{$yaml->[0]{inc} || []};
     }
-    $self->_file_in_path([@cpan_perl5inc,@perllib,@INC]);
+    $self->_file_in_path([@cpan_perl7inc,@perllib,@INC]);
 }
 
 #-> sub CPAN::Module::file_in_path ;

@@ -74,6 +74,7 @@ print OUT <<'EOT';
 # Generated from DynaLoader_pm.PL, this file is unique for every OS
 
 package DynaLoader;
+use p5;
 
 #   And Gandalf said: 'Many folk like to know beforehand what is to
 #   be set on the table; but those who have laboured to prepare the
@@ -131,6 +132,8 @@ EOT
 }
 
 my @dl_library_path;
+
+our @dl_library_path;
 
 print OUT expand_os_specific(<<'EOT');
 

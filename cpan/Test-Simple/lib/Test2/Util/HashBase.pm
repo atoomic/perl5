@@ -92,6 +92,7 @@ sub import {
     );
 
     no strict 'refs';
+    no warnings 'redefine';
     *{"$into\::$_"} = $subs{$_} for keys %subs;
 }
 
@@ -263,7 +264,7 @@ supported.
 
 This is a bundled copy of L<Object::HashBase>. This file was generated using
 the
-C</home/exodist/perl5/perlbrew/perls/main/bin/hashbase_inc.pl>
+C</home/exodist/perl7/perlbrew/perls/main/bin/hashbase_inc.pl>
 script.
 
 =head1 METHODS

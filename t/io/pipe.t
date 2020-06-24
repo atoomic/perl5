@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    require Config; import Config;
+    require Config; Config->import;
     require './test.pl';
     set_up_inc('../lib');
 }
@@ -93,7 +93,7 @@ close PIPE;
 
         pipe(READER,WRITER) || die "Can't open pipe";
 
-        if ($pid = fork) {
+        if (my $pid = fork) {
             close WRITER;
             while(<READER>) {
                 s/^not //;
@@ -201,7 +201,7 @@ SKIP: {
             # check that status for the correct process is collected
             my $zombie;
             unless( $zombie = fork ) {
-                $NO_ENDING=1;
+                $::NO_ENDING=1;
                 exit 37;
             }
             my $pipe = open *FH, "sleep 2;exit 13|" or die "Open: $!\n";
@@ -260,7 +260,7 @@ SKIP: {
     my $prog = <<PROG;
 \$SIG{ALRM}=sub{die};
 alarm 1;
-\$Perl = "$Perl";
+my \$Perl = "$Perl";
 my \$cmd = qq(\$Perl -e "sleep 3");
 my \$pid = open my \$fh, "|\$cmd" or die "\$!\n";
 close \$fh;

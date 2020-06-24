@@ -70,8 +70,7 @@ sub encode_list {
 }
 
 
-sub list_eq ($$) {
-  my ($l, $r) = @_;
+sub list_eq ($l, $r) {
   return 0 unless @$l == @$r;
   for my $i (0..$#$l) {
     if (defined $l->[$i]) {
@@ -2050,7 +2049,7 @@ SKIP:
     # buffer, only detected by ASAN, not by valgrind
     $Config{ivsize} >= 8
       or skip "[perl #129149] need 64-bit for this test", 1;
-    fresh_perl_is(<<'EOS', "ok\n", { stderr => 1 }, "pack W overflow");
+    fresh_perl_is(<<'EOS', "ok\n", { stderr => 1, run_as_five => 1 }, "pack W overflow");
 print pack("ucW", "0000", 0, 140737488355327) eq "\$,#`P,```\n\0\x{7fffffffffff}"
  ? "ok\n" : "not ok\n";
 EOS
@@ -2081,6 +2080,6 @@ SKIP:
 {
     # [perl #132655] heap-buffer-overflow READ of size 11
     # only expect failure under ASAN (and maybe valgrind)
-    fresh_perl_is('0.0 + unpack("u", "ab")', "", { stderr => 1 },
+    fresh_perl_is('0.0 + unpack("u", "ab")', "", { stderr => 1, run_as_five => 1 },
                   "ensure unpack u of invalid data nul terminates result");
 }

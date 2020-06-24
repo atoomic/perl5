@@ -13,8 +13,8 @@
 /* do not adjust the whitespace! Configure expects the numbers to be
  * exactly on the third column */
 
-#define PERL_REVISION	5		/* age */
-#define PERL_VERSION	32		/* epoch */
+#define PERL_REVISION	7		/* age */
+#define PERL_VERSION	0		/* epoch */
 #define PERL_SUBVERSION	0		/* generation */
 
 /* The following numbers describe the earliest compatible version of
@@ -34,8 +34,8 @@
    to be released for blead releases, and to 5.X.0 for maint releases. Manually
    changing them should not be necessary.
 */
-#define PERL_API_REVISION	5
-#define PERL_API_VERSION	32
+#define PERL_API_REVISION	7
+#define PERL_API_VERSION	0
 #define PERL_API_SUBVERSION	0
 /*
    XXX Note:  The selection of non-default Configure options, such

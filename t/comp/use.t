@@ -6,7 +6,16 @@ BEGIN {
     $INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print "1..84\n";
+# use p5; # without loading p5 itself...
+BEGIN {
+    ${^WARNING_BITS} = 0;
+    $^W = 0;
+
+    $^H = 0x0;
+    %^H = ();
+}
+
+print "1..79\n";
 
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
@@ -56,16 +65,16 @@ sub _ok {
     $result;
 }
 
-sub like ($$;$) {
+sub like :prototype($$;$) {
     _ok ('like', @_);
 }
-sub is ($$;$) {
+sub is :prototype($$;$) {
     _ok ('is', @_);
 }
-sub isnt ($$;$) {
+sub isnt :prototype($$;$) {
     _ok ('isnt', @_);
 }
-sub ok($;$) {
+sub ok :prototype($;$) {
     _ok ('ok', shift, undef, @_);
 }
 
@@ -95,29 +104,29 @@ is ($@, '');
 eval "use 5.000;";
 is ($@, '');
 
-eval "use 6.000;";
-like ($@, qr/Perl v6\.0\.0 required--this is only \Q$^V\E, stopped/);
+eval "use 66.000;";
+like ($@, qr/Perl v66\.0\.0 required--this is only \Q$^V\E, stopped/);
 
-eval "no 6.000;";
+eval "no 66.000;";
 is ($@, '');
 
 eval "no 5.000;";
 like ($@, qr/Perls since v5\.0\.0 too modern--this is \Q$^V\E, stopped/);
 
-eval "use 5.6;";
-like ($@, qr/Perl v5\.600\.0 required \(did you mean v5\.6\.0\?\)--this is only \Q$^V\E, stopped/);
+# eval "use 5.6;";
+# like ($@, qr/Perl v5\.600\.0 required \(did you mean v5\.6\.0\?\)--this is only \Q$^V\E, stopped/);
 
-eval "use 5.8;";
-like ($@, qr/Perl v5\.800\.0 required \(did you mean v5\.8\.0\?\)--this is only \Q$^V\E, stopped/);
+# eval "use 5.8;";
+# like ($@, qr/Perl v5\.800\.0 required \(did you mean v5\.8\.0\?\)--this is only \Q$^V\E, stopped/);
 
-eval "use 5.9;";
-like ($@, qr/Perl v5\.900\.0 required \(did you mean v5\.9\.0\?\)--this is only \Q$^V\E, stopped/);
+# eval "use 5.9;";
+# like ($@, qr/Perl v5\.900\.0 required \(did you mean v5\.9\.0\?\)--this is only \Q$^V\E, stopped/);
 
-eval "use 5.10;";
-like ($@, qr/Perl v5\.100\.0 required \(did you mean v5\.10\.0\?\)--this is only \Q$^V\E, stopped/);
+# eval "use 5.10;";
+# like ($@, qr/Perl v5\.100\.0 required \(did you mean v5\.10\.0\?\)--this is only \Q$^V\E, stopped/);
 
-eval "use 5.11;";
-like ($@, qr/Perl v5\.110\.0 required \(did you mean v5\.11\.0\?\)--this is only \Q$^V\E, stopped/);
+# eval "use 5.11;";
+# like ($@, qr/Perl v5\.110\.0 required \(did you mean v5\.11\.0\?\)--this is only \Q$^V\E, stopped/);
 
 eval sprintf "use %.6f;", $];
 is ($@, '');
@@ -127,10 +136,10 @@ eval sprintf "use %.6f;", $] - 0.000001;
 is ($@, '');
 
 eval sprintf("use %.6f;", $] + 1);
-like ($@, qr/Perl v6.\d+.\d+ required--this is only \Q$^V\E, stopped/);
+like ($@, qr/Perl v8.\d+.\d+ required--this is only \Q$^V\E, stopped/);
 
 eval sprintf "use %.6f;", $] + 0.00001;
-like ($@, qr/Perl v5.\d+.\d+ required--this is only \Q$^V\E, stopped/);
+like ($@, qr/Perl v7.\d+.\d+ required--this is only \Q$^V\E, stopped/);
 
 # check that "use 5.11.0" (and higher) loads strictures
 eval 'use 5.11.0; ${"foo"} = "bar";';
@@ -243,7 +252,7 @@ is("@test_use::got", "joe");
     #   Check that a .pm file with no package or VERSION doesn't core.
     # (git commit 2658f4d9934aba5f8b23afcc078dc12b3a40223)
     eval "use test_use_14937 3";
-    like ($@, qr/^test_use_14937 defines neither package nor VERSION--version check failed at/);
+    like ($@, qr/^test_use_14937 does not define/);
 }
 
 my @ver = split /\./, sprintf "%vd", $^V;
@@ -265,6 +274,7 @@ foreach my $index (-3..+3) {
 		++$parts[$index - 1];
 	    }
 	}
+	do { ok( 1, "skipped ".join('.', @parts) ) for 1..2; next } if grep { $_ < 0 } @parts;
 	my $v_version = sprintf "v%d.%d.%d", @parts;
 	my $version;
 	if ($v) {
@@ -296,4 +306,6 @@ foreach my $index (-3..+3) {
 	}
     }
 }
+
+print "# Done\n";
 

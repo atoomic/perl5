@@ -1,11 +1,12 @@
 #!../perl
+our %Config;
 our $POWER;
 BEGIN {
      if ($ENV{'PERL_CORE'}){
          chdir 't';
-         unshift @INC, '../lib';
+         unshift @INC, '../lib', '../../../lib';
      }
-     require Config; import Config;
+     require Config; Config->import;
      if ($Config{'extensions'} !~ /\bEncode\b/) {
          print "1..0 # Skip: Encode was not built\n";
              exit 0;

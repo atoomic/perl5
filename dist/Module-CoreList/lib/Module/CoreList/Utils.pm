@@ -1622,6 +1622,13 @@ my %delta = (
         removed => {
         }
     },
+    7.000000 => {
+        delta_from => 5.032000,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %utilities = Module::CoreList::_undelta(\%delta);
@@ -1648,7 +1655,7 @@ sub _create_aliases {
     }
 }
 
-'foo';
+1;
 
 =pod
 
@@ -1739,7 +1746,7 @@ in $].  The second level hash is utility / defined pairs.
 
 Chris C<BinGOs> Williams <chris@bingosnet.co.uk>
 
-Currently maintained by the perl 5 porters E<lt>perl5-porters@perl.orgE<gt>.
+Currently maintained by the perl 5 porters E<lt>perl7-porters@perl.orgE<gt>.
 
 This module is the result of archaeology undertaken during QA Hackathon
 in Lancaster, April 2013.

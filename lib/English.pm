@@ -1,9 +1,11 @@
 package English;
 
+use p5;
+
 our $VERSION = '1.11';
 
 require Exporter;
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
 =head1 NAME
 

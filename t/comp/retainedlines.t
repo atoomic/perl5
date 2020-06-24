@@ -6,6 +6,15 @@
 # we've not yet verified that use works.
 # use strict;
 
+# use p5; # without loading p5 itself...
+BEGIN {
+    ${^WARNING_BITS} = 0;
+    $^W = 0;
+
+    $^H = 0x0;
+    %^H = ();
+}
+
 print "1..75\n";
 my $test = 0;
 
@@ -24,7 +33,7 @@ sub failed {
     return;
 }
 
-sub is($$$) {
+sub is :prototype($$$) {
     my ($got, $expect, $name) = @_;
     $test = $test + 1;
     if (defined $expect) {

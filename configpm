@@ -150,7 +150,7 @@ $config_txt .= sprintf << 'EOT', $], $export_funcs;
 
 # for a description of the variables, please have a look at the
 # Glossary file, as written in the Porting folder, or use the url:
-# https://github.com/Perl/perl5/blob/blead/Porting/Glossary
+# https://github.com/Perl/perl7/blob/blead/Porting/Glossary
 
 package Config;
 use strict;
@@ -896,7 +896,7 @@ named variable exists.
 
 For a description of the variables, please have a look at the
 Glossary file, as written in the Porting folder, or use the url:
-https://github.com/Perl/perl5/blob/blead/Porting/Glossary
+https://github.com/Perl/perl7/blob/blead/Porting/Glossary
 
 =over 4
 
@@ -1142,7 +1142,7 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
 unshift(@INC,'lib');
 require $Config_PM;
 require $Config_heavy;
-import Config;
+Config->import;
 
 die "$0: $Config_PM not valid"
 	unless $Config{'PERL_CONFIG_SH'} eq 'true';

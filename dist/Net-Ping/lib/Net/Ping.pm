@@ -1,5 +1,7 @@
 package Net::Ping;
 
+use p5;
+
 require 5.002;
 require Exporter;
 
@@ -2521,7 +2523,7 @@ The tarball can be created as follows:
 
   perl Makefile.PL ; make ; make dist
 
-The latest Net::Ping releases are included in cperl and perl5.
+The latest Net::Ping releases are included in cperl and perl7.
 
 =head1 BUGS
 
@@ -2539,7 +2541,7 @@ L<https://github.com/rurban/Net-Ping/issues>
 
   Current maintainers:
     perl11 (for cperl, with IPv6 support and more)
-    p5p    (for perl5)
+    p5p    (for perl7)
 
   Previous maintainers:
     bbb@cpan.org (Rob Brown)

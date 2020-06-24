@@ -28,7 +28,7 @@ print "Extracting $file (with variable substitutions)\n";
 print OUT <<"!GROK!THIS!";
 $Config{startperl}
     eval 'exec $Config{perlpath} -S \$0 \${1+"\$@"}'
-	if \$running_under_some_shell;
+	if 0 && q[Running Under Some Perl];
 !GROK!THIS!
 
 # In the following, perl variables are not expanded during extraction.
@@ -1199,7 +1199,7 @@ print PM autoload ($module, $compat_version) unless $opt_c or $opt_X;
 if( ! $opt_X ){ # print bootstrap, unless XS is disabled
   if ($use_Dyna) {
 	$tmp = <<"END";
-bootstrap $module \$VERSION;
+$module->bootstrap;
 END
   } else {
 	$tmp = <<"END";

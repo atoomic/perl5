@@ -838,7 +838,7 @@ BEGIN {
 *CRLF = \CRLF();
 
 sub sockaddr_in {
-    if (@_ == 6 && !wantarray) { # perl5.001m compat; use this && die
+    if (@_ == 6 && !wantarray) { # perl7.001m compat; use this && die
 	my($af, $port, @quad) = @_;
 	warnings::warn "6-ARG sockaddr_in call is deprecated" 
 	    if warnings::enabled();
@@ -885,8 +885,11 @@ if( defined &getaddrinfo ) {
 } else {
     require Scalar::Util;
 
-    *getaddrinfo = \&fake_getaddrinfo;
-    *getnameinfo = \&fake_getnameinfo;
+    {
+    	no warnings 'once';
+	    *getaddrinfo = \&fake_getaddrinfo;
+	    *getnameinfo = \&fake_getnameinfo;    	
+    }
 
     # These numbers borrowed from GNU libc's implementation, but since
     # they're only used by our emulation, it doesn't matter if the real

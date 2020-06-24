@@ -44,13 +44,15 @@ my %feature = (
 #       be changed to account.
 
 # 5.odd implies the next 5.even, but an explicit 5.even can override it.
+my @all_features = sort keys %feature;
+
 my %feature_bundle = (
-     all     => [ keys %feature ],
-     default =>	[qw(indirect)],
-    "5.9.5"  =>	[qw(say state switch indirect)],
+     all     => [ @all_features ],
+     default =>	[ ],
+    #"5.9.5"  =>	[qw(say state switch indirect)],
     "5.10"   =>	[qw(say state switch indirect)],
-    "5.11"   =>	[qw(say state switch unicode_strings indirect)],
-    "5.13"   =>	[qw(say state switch unicode_strings indirect)],
+    #"5.11"   =>	[qw(say state switch unicode_strings indirect)],
+    #"5.13"   =>	[qw(say state switch unicode_strings indirect)],
     "5.15"   =>	[qw(say state switch unicode_strings unicode_eval
 		    evalbytes current_sub fc indirect)],
     "5.17"   =>	[qw(say state switch unicode_strings unicode_eval
@@ -69,6 +71,7 @@ my %feature_bundle = (
 		    evalbytes current_sub fc postderef_qq bitwise indirect)],
     "5.31"   =>	[qw(say state switch unicode_strings unicode_eval
 		    evalbytes current_sub fc postderef_qq bitwise indirect)],
+    "7.0"   => [ grep { $_ ne 'unicode_strings' } @all_features ],
 );
 
 my @noops = qw( postderef lexical_subs );
@@ -90,8 +93,8 @@ for my $feature (sort keys %feature) {
 }
 
 for (keys %feature_bundle) {
-    next unless /^5\.(\d*[13579])\z/;
-    $feature_bundle{"5.".($1+1)} ||= $feature_bundle{$_};
+    next unless /^(\d+)\.(\d*[13579])\z/;
+    $feature_bundle{"$1.".($2+1)} ||= $feature_bundle{$_};
 }
 
 my %UniqueBundles; # "say state switch" => 5.10
@@ -143,8 +146,7 @@ while (readline "perl.h") {
 	my $bits_needed =
 	    length sprintf "%b", scalar keys %UniqueBundles;
 	$bits =~ /1{$bits_needed}/
-	    or die "Not enough bits (need $bits_needed)"
-		 . " in $bits (binary for $hex):\n\n$_\n ";
+	    or die "Not enough bits (need $bits_needed) in $bits (binary for $hex):\n\n$_\n";
     }
     if ($Uni8Bit && $HintMask) { last }
 }
@@ -469,7 +471,9 @@ read_only_bottom_close_and_rename($h);
 __END__
 package feature;
 
-our $VERSION = '1.58';
+use p5;
+
+our $VERSION = '1.59';
 
 FEATURES
 

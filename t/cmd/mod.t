@@ -13,7 +13,8 @@ print "not ok 2\n" if 0;
 0 || (print "not ok 4\n") if 0;
 0 || (print "ok 4\n") if 1;
 
-$x = 0;
+my $x = 0;
+my @x;
 do {$x[$x] = $x;} while ($x++) < 10;
 if (join(' ',@x) eq '0 1 2 3 4 5 6 7 8 9 10') {
 	print "ok 5\n";
@@ -25,6 +26,7 @@ $x = 15;
 $x = 10 while $x < 10;
 if ($x == 15) {print "ok 6\n";} else {print "not ok 6\n";}
 
+my @y;
 $y[$_] = $_ * 2 foreach @x;
 if (join(' ',@y) eq '0 2 4 6 8 10 12 14 16 18 20') {
 	print "ok 7\n";
@@ -33,6 +35,9 @@ if (join(' ',@y) eq '0 2 4 6 8 10 12 14 16 18 20') {
 }
 
 # Well this is fragile...
+no warnings;
+# Unquoted string "foo" may clash with future reserved word
+# Useless use of a constant ("foo") in void context
 open(foo,'./TEST') || open(foo,'TEST') || open(foo,'t/TEST');
 $x = 0;
 $x++ while <foo>;

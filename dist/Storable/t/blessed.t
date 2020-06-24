@@ -19,6 +19,7 @@ BEGIN {
     );
 }
 
+use p5;
 sub BEGIN {
     if ($ENV{PERL_CORE}) {
         chdir 'dist/Storable' if -d 'dist/Storable';
@@ -27,7 +28,7 @@ sub BEGIN {
         unshift @INC, 't';
         unshift @INC, 't/compat' if $] < 5.006002;
     }
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE} and $Config{'extensions'} !~ /\bStorable\b/) {
         print "1..0 # Skip: Storable was not built\n";
         exit 0;
@@ -72,7 +73,7 @@ package main;
 
 # Still less than 256 bytes, so long classname logic not fully exercised
 #   Identifier too long - 5.004
-#   parser.h: char	tokenbuf[256]: cperl5.24 => 1024
+#   parser.h: char	tokenbuf[256]: cperl7.24 => 1024
 my $m = ($Config{usecperl} and $] >= 5.024) ? 56 : 14;
 my $longname = "LONG_NAME_" . ('xxxxxxxxxxxxx::' x $m) . "final";
 

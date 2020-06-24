@@ -19,7 +19,7 @@ BEGIN {
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
-        if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
+        if eval { require Test::NoWarnings ;  Test::NoWarnings->import; 1 };
 
     plan tests => 21 + $extra ;
 
@@ -49,9 +49,9 @@ EOM
 
 
 my $name = "n1";
-my $lex = new LexFile my $zipfile ;
+my $lex = LexFile->new( my $zipfile );
 
-my $x = new IO::Compress::Zip($zipfile, Name => $name++, AutoClose => 1);
+my $x = IO::Compress::Zip->new($zipfile, Name => $name++, AutoClose => 1);
 isa_ok $x, 'IO::Compress::Zip', '  $x' ;
 
 
@@ -70,7 +70,7 @@ push @buffers, undef;
     close F;                    
 }
 
-my $u = new IO::Uncompress::Unzip $zipfile, Transparent => 1, MultiStream => 0
+my $u = IO::Uncompress::Unzip->new( $zipfile, Transparent => 1, MultiStream => 0 )
     or die "Cannot open $zipfile: $UnzipError";
 
 my @names ;

@@ -20,6 +20,8 @@ BEGIN {
 # (Just-in-time test naming)
 plan tests => 501;
 
+use p5;
+
 # numerics
 ok ((0xdead & 0xbeef) == 0x9ead);
 ok ((0xdead | 0xbeef) == 0xfeef);
@@ -523,11 +525,14 @@ eval { $obj |= "Q" };
 $strval = "z";
 is("$obj", "z", "|= doesn't break string overload");
 
-# [perl #29070]
-$^A .= new version ~$_ for eval sprintf('"\\x%02x"', 0xff - ord("1")),
-                           $::IS_EBCDIC ? v13 : v205, # 255 - ord('2')
-                           eval sprintf('"\\x%02x"', 0xff - ord("3"));
-is $^A, "123", '~v0 clears vstring magic on retval';
+{
+  use feature 'indirect';
+  # [perl #29070]
+  $^A .= new version ~$_ for eval sprintf('"\\x%02x"', 0xff - ord("1")),
+                             $::IS_EBCDIC ? v13 : v205, # 255 - ord('2')
+                             eval sprintf('"\\x%02x"', 0xff - ord("3"));
+  is $^A, "123", '~v0 clears vstring magic on retval';
+}
 
 {
     my $w = $Config::Config{ivsize} * 8;
@@ -616,7 +621,7 @@ is $byte, "\0", "utf8 &. appends null byte";
 # only visible under sanitize
 fresh_perl_is('$x = "UUUUUUUV"; $y = "xxxxxxx"; $x |= $y; print $x',
               ( $::IS_EBCDIC) ? 'XXXXXXXV' : '}}}}}}}V',
-              {}, "[perl #129995] access to freed memory");
+              { run_as_five => 1 }, "[perl #129995] access to freed memory");
 
 
 #

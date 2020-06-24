@@ -2,6 +2,8 @@ package Getopt::Std;
 require 5.000;
 require Exporter;
 
+use p5;
+
 =head1 NAME
 
 Getopt::Std - Process single-character switches with switch clustering
@@ -141,7 +143,7 @@ sub getopt (;$$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
 }
 
@@ -296,7 +298,7 @@ sub getopts ($;$) {
     }
     unless (ref $hash) { 
 	local $Exporter::ExportLevel = 1;
-	import Getopt::Std;
+	Getopt::Std->import;
     }
     $errs == 0;
 }

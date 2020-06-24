@@ -1,7 +1,10 @@
 BEGIN {
     if ($ENV{'PERL_CORE'}){
         chdir 't' if -d 't';
-        @INC = '../lib';
+        #@INC = '../lib';
+        my $lib = $^X;
+        $lib =~ s{(\b)perl[^/]*$}{$1lib};
+        @INC = ( '../lib', $lib );
     }
 }
 
@@ -25,7 +28,7 @@ BEGIN {
 my $testno = 1;
 # instead of "for my $test (...)" , which is my preference.
 # Not sure which perl version has started supporting.  MIME::Base64
-# was supposed to work with very old perl5, right?
+# was supposed to work with very old perl7, right?
 my $test;
 
 encodeTest();

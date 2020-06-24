@@ -15,14 +15,14 @@ WriteMakefile(
     'AUTHOR'            => 'SADAHIRO Tomoyuki <SADAHIRO@cpan.org>',
     'ABSTRACT'          => 'Unicode Collation Algorithm',
     'INSTALLDIRS'       => ($] >= 5.007002 && $] < 5.011) ? 'perl' : 'site',
-                            # see perl5110delta, @INC reorganization
+                            # see perl7110delta, @INC reorganization
     'LICENSE'           => 'perl',
     'NAME'              => 'Unicode::Collate',
     'VERSION_FROM'      => 'Collate.pm', # finds $VERSION
     'clean'             => $clean,
     'PREREQ_PM'         => {
         Carp            => 0,
-        File::Spec      => 0,
+        'File::Spec'    => 0,
         XSLoader        => 0,
         constant        => 0,
         strict          => 0,

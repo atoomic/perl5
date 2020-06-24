@@ -1,6 +1,7 @@
 # -*- Mode: cperl; coding: utf-8; cperl-indent-level: 4 -*-
 # vim: ts=4 sts=4 sw=4:
 package CPAN::Distribution;
+use p5;
 use strict;
 use Cwd qw(chdir);
 use CPAN::Distroprefs;
@@ -394,7 +395,7 @@ sub get {
                            : ($ENV{PERLLIB} || "");
     local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
     # local $ENV{PERL_USE_UNSAFE_INC} = exists $ENV{PERL_USE_UNSAFE_INC} ? $ENV{PERL_USE_UNSAFE_INC} : 1; # get
-    $CPAN::META->set_perl5lib;
+    $CPAN::META->set_perl7lib;
     local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
     my $sub_wd = CPAN::anycwd(); # for cleaning up as good as possible
@@ -1334,7 +1335,7 @@ Could not determine which directory to use for looking at $dist.
 
         local $ENV{PERL5OPT} = defined $ENV{PERL5OPT} ? $ENV{PERL5OPT} : "";
         # local $ENV{PERL_USE_UNSAFE_INC} = exists $ENV{PERL_USE_UNSAFE_INC} ? $ENV{PERL_USE_UNSAFE_INC} : 1; # look
-        $CPAN::META->set_perl5lib;
+        $CPAN::META->set_perl7lib;
         local $ENV{MAKEFLAGS}; # protect us from outer make calls
 
         unless (system($shell) == 0) {

@@ -6,6 +6,7 @@
 BEGIN {
     chdir 't' if -d 't';
     require './test.pl';
+    set_up_inc('../lib');
     skip_all_without_unicode_tables();
 }
 
@@ -237,7 +238,7 @@ for ( 0x0 .. 0xff ) {
             }
         }
         my $message = "  ... and doesn't generate any warnings";
-        $message = "  TODO $message" if    $ord == 0
+        $message = "  # TODO $message" if    $ord == 0
                                         || $chr =~ /\s/a;
 
         if (! ok(@warnings == 0, $message)) {

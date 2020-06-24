@@ -1,5 +1,6 @@
 package Unicode::UCD;
 
+use p5;
 use strict;
 use warnings;
 no warnings 'surrogate';    # surrogates can be inputs to this
@@ -4783,7 +4784,7 @@ value.
 
 =head1 AUTHOR
 
-Jarkko Hietaniemi.  Now maintained by perl5 porters.
+Jarkko Hietaniemi.  Now maintained by perl7 porters.
 
 =cut
 

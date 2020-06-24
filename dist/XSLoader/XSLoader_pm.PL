@@ -11,6 +11,7 @@ print OUT <<'EOT';
 
 package XSLoader;
 
+use p5;
 $VERSION = "0.30"; # remember to update version in POD!
 
 #use strict;
@@ -158,7 +159,8 @@ print OUT <<'EOT';
 EOT
 
     if ($^O eq 'darwin') {
-      my $extra_arg = ', 1 ' if $DynaLoader::VERSION ge '1.37';
+        my $extra_arg = '';
+        $extra_arg = ', 1 ' if $DynaLoader::VERSION ge '1.37';
 print OUT <<"EOT";
     if (\$boot_symbol_ref = dl_find_symbol( 0, \$bootname $extra_arg)) {
         goto boot; #extension library has already been loaded, e.g. darwin

@@ -26,6 +26,7 @@
 # documented at the top of embed.fnc.
 
 use strict;
+use feature q{:all};
 
 if (@ARGV) {
     my $workdir = shift;
@@ -46,8 +47,7 @@ my @specialized_docs = sort qw( perlguts
                                 perlmroapi
                                 config.h
                               );
-sub name_in_pod($) {
-    my $name = shift;
+sub name_in_pod($name) {
     return "F<$name>" if $name =~ /\./;
     return "L<$name>";
 }
@@ -72,8 +72,7 @@ my %missing;
 
 my $curheader = "Unknown section";
 
-sub autodoc ($$) { # parse a file and extract documentation info
-    my($fh,$file) = @_;
+sub autodoc ($fh, $file) { # parse a file and extract documentation info
     my($in, $doc, $line, $header_doc);
 
     # Count lines easier
@@ -228,8 +227,7 @@ DOC:
     }
 }
 
-sub docout ($$$) { # output the docs for one function
-    my($fh, $name, $docref) = @_;
+sub docout ($fh, $name, $docref) { # output the docs for one function
     my($flags, $docs, $ret, $file, @args) = @$docref;
     $name =~ s/\s*$//;
 
@@ -364,7 +362,7 @@ document are not intended for public use, and should NOT be used under any
 circumstances.
 
 If you feel you need to use one of these functions, first send email to
-L<perl5-porters@perl.org|mailto:perl5-porters@perl.org>.  It may be
+L<perl7-porters@perl.org|mailto:perl7-porters@perl.org>.  It may be
 that there is a good reason for the function not being documented, and it
 should be removed from this list; or it may just be that no one has gotten
 around to documenting it.  In the latter case, you will be asked to submit a

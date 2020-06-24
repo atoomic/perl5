@@ -667,7 +667,7 @@ sub run_tests {
 
     {
         my $message = 'UTF-8 hash keys and /$/';
-        # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters
+        # http://www.xray.mpe.mpg.de/mailing-lists/perl7-porters
         #                                         /2002-01/msg01327.html
 
         my $u = "a\x{100}";
@@ -1389,7 +1389,7 @@ sub run_tests {
     }
 
     {
-        my $message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
+        my $message = "http://nntp.perl.org/group/perl.perl7.porters/118663";
         my $qr_barR1 = qr/(bar)\g-1/;
         like("foobarbarxyz", $qr_barR1, $message);
         like("foobarbarxyz", qr/foo${qr_barR1}xyz/, $message);
@@ -1732,7 +1732,7 @@ sub run_tests {
         $_ = '123';
         is("$1", 'abc', "/g leads to unsafe match vars: $1");
 
-        fresh_perl_is(<<'EOP', ">abc<\n", {}, 'mention $&');
+        fresh_perl_is(<<'EOP', ">abc<\n", { run_as_five => 1 }, 'mention $&');
 $&;
 my $x; 
 ($x='abc')=~/(abc)/g; 
@@ -2255,7 +2255,7 @@ EOP
                 print $ls eq lc $s ? "good\n" : "bad: [$ls]\n";
 EOF
             "good\n",
-            {},
+            { run_as_five => 1 },
             "swash triggered by lc() doesn't corrupt \$1"
         );
     }
@@ -2476,7 +2476,7 @@ EOF
     }
 
     { # Regexp:Grammars was broken:
-  # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2013-06/msg01290.html
+  # http://www.xray.mpe.mpg.de/mailing-lists/perl7-porters/2013-06/msg01290.html
         fresh_perl_like('use warnings; "abc" =~ qr{(?&foo){0}abc(?<foo>)}',
                         qr/Quantifier unexpected on zero-length expression/,
                         {},
@@ -2489,7 +2489,7 @@ EOF
         $Config{uvsize} == 8
 	  or skip("need large code-points for this test", 1);
 
-	fresh_perl_is('/\x{E000000000}|/ and print qq(ok\n)', "ok\n", {},
+	fresh_perl_is('/\x{E000000000}|/ and print qq(ok\n)', "ok\n", { run_as_five => 1 },
 		      "buffer overflow in TRIE_STORE_REVCHAR");
     }
 

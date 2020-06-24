@@ -1,12 +1,14 @@
 #!./perl
 
+use p5;
+
 sub BEGIN {
     if ($] < 5.007) {
 	print "1..0 # Skip: no utf8 hash key support\n";
 	exit 0;
     }
     unshift @INC, 't';
-    require Config; import Config;
+    require Config; Config->import;
     if ($ENV{PERL_CORE}){
 	if($Config{'extensions'} !~ /\bStorable\b/) {
 	    print "1..0 # Skip: Storable was not built\n";

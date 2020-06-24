@@ -7,7 +7,7 @@
 #	Windows SDK 64-bit compiler and tools
 #
 # This is set up to build a perl.exe that runs off a shared library
-# (perl532.dll).  Also makes individual DLLs for the XS extensions.
+# (perl70.dll).  Also makes individual DLLs for the XS extensions.
 #
 # The easiest way to customize the build process is to use parameters like this:
 #
@@ -64,7 +64,7 @@ INST_TOP := $(INST_DRV)\perl
 # versioned installation can be obtained by setting INST_TOP above to a
 # path that includes an arbitrary version string.
 #
-#INST_VER	:= \5.32.0
+#INST_VER	:= \7.0.0
 
 #
 # Comment this out if you DON'T want your perl installation to have
@@ -110,7 +110,7 @@ USE_IMP_SYS	:= define
 # Comment out next assign to disable perl's I/O subsystem and use compiler's
 # stdio for IO - depending on your compiler vendor and run time library you may
 # then get a number of fails from make test i.e. bugs - complain to them not us ;-).
-# You will also be unable to take full advantage of perl5.8's support for multiple
+# You will also be unable to take full advantage of perl7.8's support for multiple
 # encodings and may see lower IO performance. You have been warned.
 #
 USE_PERLIO	:= define
@@ -230,7 +230,7 @@ DEFAULT_INC_EXCLUDES_DOT := define
 # set this to additionally provide a statically linked perl-static.exe.
 # Note that dynamic loading will not work with this perl, so you must
 # include required modules statically using the STATIC_EXT or ALL_STATIC
-# variables below. A static library perl532s.lib will also be created.
+# variables below. A static library perl70s.lib will also be created.
 # Ordinary perl.exe is not affected by this option.
 #
 #BUILD_STATIC	:= define
@@ -1004,9 +1004,9 @@ ifeq ($(CCTYPE),GCC)
 
 CFGSH_TMPL	= config.gc
 CFGH_TMPL	= config_H.gc
-PERLIMPLIB	= $(COREDIR)\libperl532$(a)
-PERLIMPLIBBASE	= libperl532$(a)
-PERLSTATICLIB	= ..\libperl532s$(a)
+PERLIMPLIB	= $(COREDIR)\libperl70$(a)
+PERLIMPLIBBASE	= libperl70$(a)
+PERLSTATICLIB	= ..\libperl70s$(a)
 INT64		= long long
 
 else
@@ -1019,12 +1019,12 @@ endif
 
 # makedef.pl must be updated if this changes, and this should normally
 # only change when there is an incompatible revision of the public API.
-PERLIMPLIB	?= $(COREDIR)\perl532$(a)
-PERLIMPLIBBASE	?= perl532$(a)
-PERLEXPLIB	?= $(COREDIR)\perl532.exp
-PERLSTATICLIB	?= ..\perl532s$(a)
-PERLDLL		= ..\perl532.dll
-PERLDLLBASE	= perl532.dll
+PERLIMPLIB	?= $(COREDIR)\perl70$(a)
+PERLIMPLIBBASE	?= perl70$(a)
+PERLEXPLIB	?= $(COREDIR)\perl70.exp
+PERLSTATICLIB	?= ..\perl70s$(a)
+PERLDLL		= ..\perl70.dll
+PERLDLLBASE	= perl70.dll
 
 # don't let "gmake -n all" try to run "miniperl.exe make_ext.pl"
 PLMAKE		= gmake

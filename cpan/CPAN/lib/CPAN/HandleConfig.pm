@@ -1,4 +1,5 @@
 package CPAN::HandleConfig;
+use p5;
 use strict;
 use vars qw(%can %keys $loading $VERSION);
 use File::Path ();
@@ -90,7 +91,7 @@ $VERSION = "5.5011"; # see also CPAN::Config::VERSION at end of file
      "password",
      "patch",
      "patches_dir",
-     "perl5lib_verbosity",
+     "perl7lib_verbosity",
      "plugin_list",
      "prefer_external_tar",
      "prefer_installer",

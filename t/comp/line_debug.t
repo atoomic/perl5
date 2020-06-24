@@ -1,8 +1,9 @@
 #!./perl
 
-BEGIN { unshift @INC, '.' }
-
-chdir 't' if -d 't';
+BEGIN { 
+	chdir 't' if -d 't';
+	unshift @INC, '.', '../lib'; # no strict 
+}
 
 sub ok {
     my($test,$ok) = @_;
@@ -23,6 +24,8 @@ print "1..", 2+$nlines, "\n";
 
 $^P = 0x2;
 do "comp/line_debug_0.aux";
+
+no strict 'refs';
 
 ok 1, scalar(@{"_<comp/line_debug_0.aux"}) == 1+$nlines;
 ok 2, !defined(${"_<comp/line_debug_0.aux"}[0]);

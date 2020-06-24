@@ -1,5 +1,6 @@
 package ExtUtils::MM_Unix;
 
+use p5;
 require 5.006;
 
 use strict;
@@ -1166,7 +1167,9 @@ WARNING
             print "Executing $abs\n" if ($trace >= 2);
 
             my $val;
-            my $version_check = qq{"$abs" -le "require $ver; print qq{VER_OK}"};
+            my $lib = $abs;
+            $lib =~ s{/[^/]+$}{/lib};
+            my $version_check = qq{"$abs" -I$lib -le "require $ver; print qq{VER_OK}"};
 
             # To avoid using the unportable 2>&1 to suppress STDERR,
             # we close it before running the command.
@@ -2068,7 +2071,7 @@ sub init_PERL {
 
     my @perls = ($thisperl);
     push @perls, map { "$_$Config{exe_ext}" }
-                     ("perl$Config{version}", 'perl5', 'perl');
+                     ("perl$Config{version}", 'perl7', 'perl');
 
     # miniperl has priority over all but the canonical perl when in the
     # core.  Otherwise its a last resort.
@@ -2081,7 +2084,7 @@ sub init_PERL {
     }
 
     $self->{PERL} ||=
-        $self->find_perl(5.0, \@perls, \@defpath, $Verbose );
+        $self->find_perl(7.0, \@perls, \@defpath, $Verbose );
 
     my $perl = $self->{PERL};
     $perl =~ s/^"//;

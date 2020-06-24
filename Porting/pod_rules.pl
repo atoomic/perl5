@@ -183,7 +183,7 @@ sub do_vms {
     my ($name, $makefile) = @_;
 
     # Looking for the macro defining the current perldelta:
-    #PERLDELTA_CURRENT = [.pod]perl5139delta.pod
+    #PERLDELTA_CURRENT = [.pod]perl7139delta.pod
 
     my $re = qr{\nPERLDELTA_CURRENT\s+=\s+\Q[.pod]perl\E\d+delta\.pod\n}smx;
     $makefile
@@ -203,7 +203,7 @@ sub do_unix {
                       }mge;
 
     # pod/perl511delta.pod: pod/perldelta.pod
-    #         cd pod && $(LNS) perldelta.pod perl511delta.pod
+    #         cd pod && $(LNS) perldelta.pod perl711delta.pod
 
     # although it seems that HP-UX make gets confused, always tried to
     # regenerate the symlink, and then the ln -s fails, as the target exists.

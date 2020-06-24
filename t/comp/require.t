@@ -6,6 +6,8 @@ BEGIN {
     push @INC, '../lib', '../ext/re';
 }
 
+use p5;
+
 sub do_require {
     %INC = ();
     write_file('bleah.pm',@_);
@@ -324,7 +326,7 @@ if (defined &DynaLoader::boot_DynaLoader) {
     if ($@ =~ /^This is an expected error/) {
 	print "ok $i - require(func())\n";
     } else {
-	print "not ok $i - require(func())\n";
+	print "not ok $i - require(func()) -- $@\n";
     }
 } else {
     print "ok $i # SKIP Cwd may not be available in miniperl\n";

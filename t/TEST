@@ -178,7 +178,8 @@ if ($show_elapsed_time) { require Time::HiRes }
 my %timings = (); # testname => [@et] pairs if $show_elapsed_time.
 
 # Roll your own File::Find!
-sub _find_tests { our @found=(); push @ARGV, _find_files('\.t$', $_[0]) }
+our @found;
+sub _find_tests { @found=(); push @ARGV, _find_files('\.t$', $_[0]) }
 sub _find_files {
     my($patt, @dirs) = @_;
     for my $dir (@dirs) {
@@ -846,7 +847,7 @@ SHRDLU_1
 ###   ./perl harness
 ### in the 't' directory since most (>=80%) of the tests succeeded.
 SHRDLU_2
-	if (eval {require Config; import Config; 1}) {
+	if (eval {require Config; Config->import; 1}) {
 	    if ($::Config{usedl} && (my $p = $::Config{ldlibpthname})) {
 		warn <<SHRDLU_3;
 ### You may have to set your dynamic library search path,
