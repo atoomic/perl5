@@ -12,6 +12,15 @@ require './regen/regen_lib.pl';
 require './t/test.pl';
 $::NO_ENDING = $::NO_ENDING = 1;
 
+END {
+    print STDERR <<~HINT;# unless $::Tests_Are_Passing;
+    # Hint:  A failure in this file can often be corrected by running:
+    #  ./perl -Ilib regen/_________.pl
+    # ... where you fill in the blank by looking at what 'make test_porting'
+    # tells you.
+HINT
+}
+
 if ( $^O eq "VMS" ) {
   skip_all( "- regen.pl needs porting." );
 }
@@ -105,7 +114,9 @@ OUTER: foreach my $file (@files) {
 }
 
 foreach (@progs) {
-    my $command = "$^X -I. $_ --tap";
+    my $args = qq[-Ilib $_ --tap];
+    diag("./perl $args");
+    my $command = "$^X $args";
     system $command
         and die "Failed to run $command: $?";
 }
