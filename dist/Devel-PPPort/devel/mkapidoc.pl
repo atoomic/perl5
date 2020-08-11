@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 ################################################################################
 #
 #  mkapidoc.pl -- generate apidoc.fnc from scanning the Perl source
