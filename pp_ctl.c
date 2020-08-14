@@ -1654,7 +1654,11 @@ Perl_die_unwind(pTHX_ SV *msv)
     if (in_eval) {
 	I32 cxix;
 
-        exceptsv = sv_2mortal(SvREFCNT_inc_simple_NN(exceptsv));
+        if (PL_phase == PERL_PHASE_DESTRUCT) {
+            exceptsv = sv_mortalcopy(exceptsv);
+        } else {
+            exceptsv = sv_2mortal(SvREFCNT_inc_simple_NN(exceptsv));
+        }
 
 	/*
 	 * Historically, perl used to set ERRSV ($@) early in the die
