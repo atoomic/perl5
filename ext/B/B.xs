@@ -472,6 +472,7 @@ typedef PADLIST	*B__PADLIST;
 typedef PADNAMELIST *B__PADNAMELIST;
 typedef PADNAME	*B__PADNAME;
 
+typedef INVLIST  *B__INVLIST;
 
 #ifdef MULTIPLICITY
 #  define ASSIGN_COMMON_ALIAS(prefix, var) \
