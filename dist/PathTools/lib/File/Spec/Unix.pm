@@ -241,8 +241,10 @@ L<File::Spec::VMS/file_name_is_absolute>).
 =cut
 
 sub file_name_is_absolute {
-    my ($self,$file) = @_;
-    return scalar($file =~ m:^/:s);
+    #my($self,$file) = @_;
+    #$self = $_[0]
+    #$file = $_[1]
+    return index($_[1],'/') == 0 ? 1 : 0;
 }
 
 =item path
