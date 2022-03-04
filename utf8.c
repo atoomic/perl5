@@ -1475,6 +1475,14 @@ Perl__utf8n_to_uvchr_msgs_helper(const U8 *s,
           || UTF8_IS_NONCHAR(s0,send));
     */
 
+    /* Check this before dereferencing s0, just below */
+    if (UNLIKELY(curlen == 0)) {
+        possible_problems |= UTF8_GOT_EMPTY;
+        curlen = 0;
+        uv = UNICODE_REPLACEMENT;
+        goto ready_to_handle_errors;
+    }
+
     s = s0;
     uv = *s0;
     possible_problems = 0;
@@ -1517,13 +1525,6 @@ Perl__utf8n_to_uvchr_msgs_helper(const U8 *s,
      * another, and if we abandon searching for others after finding the
      * allowed one, we could allow in something that shouldn't have been.
      */
-
-    if (UNLIKELY(curlen == 0)) {
-        possible_problems |= UTF8_GOT_EMPTY;
-        curlen = 0;
-        uv = UNICODE_REPLACEMENT;
-        goto ready_to_handle_errors;
-    }
 
     expectlen = UTF8SKIP(s);
 
