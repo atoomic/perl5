@@ -11,6 +11,8 @@ use TestInit qw(T);    # T is chdir to the top level
 use strict;
 use File::Spec;
 
+skip_all("cPanel build: do not worry about authors");
+
 find_git_or_skip('all');
 skip_all(
     "This distro may have modified some files in cpan/. Skipping validation.")
