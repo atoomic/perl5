@@ -100,13 +100,13 @@ feature - Perl pragma to enable new features
     say "The case-folded version of $x is: " . fc $x;
 
 
-    # set features to match the :5.10 bundle, which may turn off or on
+    # set features to match the :5.36 bundle, which may turn off or on
     # multiple features (see below)
-    use feature ':5.10';
+    use feature ':5.36';
 
 
-    # implicitly loads :5.10 feature bundle
-    use v5.10;
+    # implicitly loads :5.36 feature bundle
+    use v5.36;
 
 =head1 DESCRIPTION
 
@@ -145,6 +145,160 @@ has lexical effect.
 
 C<no feature> with no features specified will reset to the default group.  To
 disable I<all> features (an unusual request!) use C<no feature ':all'>.
+
+=head1 FEATURES CHEAT SHEET
+
+Here is a quick cheat sheet table to sumup features including per version.
+
+=head2 v5.10 features
+
+=over 4
+
+=item * bareword_filehandles
+
+See L</"The 'bareword_filehandles' feature">.
+
+=item * indirect
+
+See L</"The 'indirect' feature">.
+
+=item * multidimensional
+
+See L</"The 'multidimensional' feature">.
+
+=item * say
+
+See L</"The 'say' feature">.
+
+=item * state
+
+See L</"The 'state' feature">.
+
+=item * switch
+
+See L</"The 'switch' feature">.
+
+=back
+
+=head2 v5.12 features
+
+All features from L</"v5.10 features"> with the addition of
+
+=over 4
+
+=item * unicode_strings
+
+See L</"The 'unicode_strings' feature">.
+
+=back
+
+=head2 v5.14 features
+
+This is similar to L</"v5.12 features">
+
+=head2 v5.16 features
+
+Features from L</"v5.14 features"> and
+
+=over 4
+
+=item * current_sub
+
+See L</"The 'current_sub' feature">.
+
+=item * evalbytes
+
+See L</"The 'unicode_eval' and 'evalbytes' features">.
+
+=item * fc
+
+See L</"The 'fc' feature">.
+
+=item * unicode_eval
+
+See L</"The 'unicode_eval' and 'evalbytes' features">.
+
+=back
+
+=head2 v5.18 features
+
+This is similar to L</"v5.16 features">
+
+=head2 v5.20 features
+
+This is similar to L</"v5.16 features">
+
+=head2 v5.22 features
+
+This is similar to L</"v5.16 features">
+
+=head2 v5.24 features
+
+All features from L</"v5.16 features"> and
+
+=over 4
+
+=item * postderef_qq
+
+See L</"The 'postderef' and 'postderef_qq' features">.
+
+=back
+
+=head2 v5.26 features
+
+This is similar to L</"v5.24 features">
+
+=head2 v5.28 features
+
+All features from L</"v5.26 features"> and
+
+=over 4
+
+=item * bitwise
+
+See L</"The 'bitwise' feature">.
+
+=back
+
+=head2 v5.36 features
+
+Features from L</"v5.10 features"> with the removal of
+
+=over 4
+
+=item * indirect (removed)
+
+=item * multidimensional (removed)
+
+=item * switch (removed)
+
+=back
+
+and the addition of
+
+=over 4
+
+=item * isa
+
+See L</"The 'isa' feature">.
+
+=item * signatures
+
+See L</"The 'signatures' feature">.
+
+=back
+
+=head2 v5.38
+
+Features from L</"v5.36 features"> with the removal of
+
+=over 4
+
+=item * bareword_filehandles (removed)
+
+See L</"The 'bareword_filehandles' feature">.
+
+=back
 
 =head1 AVAILABLE FEATURES
 
@@ -415,7 +569,7 @@ previous versions, it was simply on all the time.
 You can use the L<multidimensional> module on CPAN to disable
 multidimensional array emulation for older versions of Perl.
 
-=head2 The 'bareword_filehandles' feature.
+=head2 The 'bareword_filehandles' feature
 
 This feature enables bareword filehandles for builtin functions
 operations, a generally discouraged practice.  It is enabled by
@@ -974,12 +1128,12 @@ main compilation unit (that is, the one-liner that follows C<-E>).
 By explicitly requiring a minimum Perl version number for your program, with
 the C<use VERSION> construct.  That is,
 
-    use v5.10.0;
+    use v5.36.0;
 
 will do an implicit
 
     no feature ':all';
-    use feature ':5.10';
+    use feature ':5.36';
 
 and so on.  Note how the trailing sub-version
 is automatically stripped from the
@@ -987,7 +1141,7 @@ version.
 
 But to avoid portability warnings (see L<perlfunc/use>), you may prefer:
 
-    use 5.010;
+    use 5.036;
 
 with the same effect.
 
