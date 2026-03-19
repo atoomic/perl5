@@ -9215,7 +9215,13 @@ redo_curchar:
         }
     }
 
-    nextchar(pRExC_state);
+    /* If recursed down multiple set calls, leave the parse as-is for the next
+     * layer up.  (GH #24238).  Otherwise advance to prepare for the next
+     * construct. */
+    if (RExC_sets_depth == 0) {
+        nextchar(pRExC_state);
+    }
+
     return node;
 
   regclass_failed:
