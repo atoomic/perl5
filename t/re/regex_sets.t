@@ -240,6 +240,33 @@ for my $char ("٠", "٥", "٩") {
     like ("y",
           qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/x,
           "/x modifier works with nested sets");
+    like ("Q",
+          qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/x,
+          "/x modifier works with nested sets - upper");
+    like ("7",
+          qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/x,
+          "/x modifier works with nested sets - digit");
+    unlike ("!",
+            qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/x,
+            "/x modifier works with nested sets - non-member excluded");
+
+    # Without /x as well, to confirm the depth gating is independent of flags.
+    like ("y",
+          qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/,
+          "nested sets compose without /x");
+
+    # Intersection and subtraction across nested sets must also compose.
+    like ("a",
+          qr/(?[ $RE_CLASS_LOWER & $RE_CLASS_LOWER ])/x,
+          "intersection of nested sets");
+    unlike ("a",
+            qr/(?[ $RE_CLASS_LOWER - [aeiou] ])/x,
+            "subtraction with nested set on the left");
+
+    # Triple-nested interpolation exercises depth > 1 as well.
+    my $alnum = qr/(?[ $RE_CLASS_LOWER + $RE_CLASS_UPPER + $RE_CLASS_DIGIT ])/x;
+    like ("z", qr/(?[ $alnum ])/x,    "triple-nested set composes (match)");
+    unlike ("!", qr/(?[ $alnum ])/x,  "triple-nested set composes (non-match)");
 }
 
 done_testing();
